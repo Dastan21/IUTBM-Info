@@ -74,6 +74,7 @@ async function msgReply(msg, message){
 }
 
 async function showEDT(msg, arg) {
+	if (!arg) { msgReply(msg, "le groupe ne peut-être vide"); return; }
 	arg = arg.toLowerCase();
 	if (!groupes_liste.includes(arg)) { msgReply(msg, "le format du semestre/groupe est mal indiqué (voir `edt help show`)"); return; }
 	let annee, semestre, classe, groupe;
