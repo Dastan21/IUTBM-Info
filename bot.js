@@ -1,11 +1,12 @@
 const Discord = require('discord.js')
 const bot = new Discord.Client()
-const config = require('./config')
-const id_groups = require('./id_groups')
-var mongo = require('mongodb')
-var MongoClient = require('mongodb').MongoClient;
+// var mongo = require('mongodb')
+// var MongoClient = require('mongodb').MongoClient;
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const { Options } = require('selenium-webdriver/chrome');
+/* Personal imports */
+const config = require('./config')
+const id_groups = require('./id_groups')
 const groupes_liste = [
 	"s1-a1", "s1-a2", "s1-b1", "s1-b2", "s1-c1", "s1-c2", "s1-d1",
 	"s2-a1", "s2-a2", "s2-b1", "s2-b2", "s2-c1", "s2-c2", "s2-d1",
@@ -22,12 +23,12 @@ bot.on('ready', () => {
 
 
 /* Setup Mongo Database */
-var url = "mongodb://edtinfo:edtinfobot@localhost/edtinfo_db";
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) {
-	if (err) throw err;
-	console.log("Database connected");
-	db.close();
-});
+// var url = "mongodb://edtinfo:edtinfobot@localhost/edtinfo_db";
+// MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) {
+// 	if (err) throw err;
+// 	console.log("Database connected");
+// 	db.close();
+// });
 
 
 
