@@ -3,7 +3,8 @@ const bot = new Discord.Client()
 // var mongo = require('mongodb')
 // var MongoClient = require('mongodb').MongoClient;
 const { Builder, By, Key, until } = require('selenium-webdriver');
-const { Options } = require('selenium-webdriver/chrome');
+var chrome = require('selenium-webdriver/chrome');
+
 /* Personal imports */
 const config = require('./config')
 const id_groups = require('./id_groups')
@@ -87,10 +88,12 @@ async function showEDT(msg, arg) {
 
 async function connectToADE(annee, semestre, classe, groupe) {
 	var screenshot = null;
+	var service = new chrome.ServiceBuilder("./chromedriver.exe").build();
+	chrome.setDefaultService(service);
 	let driver = await new Builder()
 		.forBrowser('chrome')
 		.setChromeOptions(new Options().headless().windowSize({ width: 1920, height: 1080 }))
-		// .setChromeOptions(new Options().windowSize({ width: 1920, height: 1080 })) // DEBUG
+		.withCapabilities(webdriver.Capabilities.chrome())
 		.build();
 	try {
 		await driver.get('https://sedna.univ-fcomte.fr/direct/myplanning.jsp');
