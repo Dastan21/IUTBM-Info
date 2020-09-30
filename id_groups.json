@@ -1,0 +1,140 @@
+{
+	"1e": {
+		"xpath": "//div[@aria-label='DUT Informatique 1e année']",
+		"s1": {
+			"xpath": "//div[@aria-label='S1']",
+			"a": {
+				"xpath": "//div[@aria-label='S1A']",
+				"a1": {
+					"xpath": "//div[@aria-label='S1-A1']"
+				},
+				"a2": {
+					"xpath": "//div[@aria-label='S1-A2']"
+				}
+			},
+			"b": {
+				"xpath": "//div[@aria-label='S1B']",
+				"b1": {
+					"xpath": "//div[@aria-label='S1-B1']"
+				},
+				"b2": {
+					"xpath": "//div[@aria-label='S1-B2']"
+				}
+			},
+			"c": {
+				"xpath": "//div[@aria-label='S1C']",
+				"c1": {
+					"xpath": "//div[@aria-label='S1-C1']"
+				},
+				"c2": {
+					"xpath": "//div[@aria-label='S1-C2']"
+				}
+			},
+			"d": {
+				"xpath": "//div[@aria-label='S1D']",
+				"d1": {
+					"xpath": "//div[@aria-label='S1-D1']]"
+				}
+			}
+		},
+		"s2": {
+			"xpath": "//div[@aria-label='S2']",
+			"a": {
+				"xpath": "//div[@aria-label='S2A']",
+				"a1": {
+					"xpath": "//div[@aria-label='S2-A1']"
+				},
+				"a2": {
+					"xpath": "//div[@aria-label='S2-A2']"
+				}
+			},
+			"b": {
+				"xpath": "//div[@aria-label='S2B']",
+				"b1": {
+					"xpath": "//div[@aria-label='S2-B1']"
+				},
+				"b2": {
+					"xpath": "//div[@aria-label='S2-B2']"
+				}
+			},
+			"c": {
+				"xpath": "//div[@aria-label='S2C']",
+				"c1": {
+					"xpath": "//div[@aria-label='S2-C1']"
+				},
+				"c2": {
+					"xpath": "//div[@aria-label='S2-C2']"
+				}
+			},
+			"d": {
+				"xpath": "//div[@aria-label='S2D']",
+				"d1": {
+					"xpath": "//div[@aria-label='S2-D1']"
+				}
+			}
+		}
+	},
+	"2e": {
+		"xpath": "//div[@aria-label='DUT Informatique 2e année']",
+		"s3": {
+			"xpath": "//div[@aria-label='S3']",
+			"a": {
+				"xpath": "//div[@aria-label='S3A']",
+				"a1": {
+					"xpath": "//div[@aria-label='S3-A1']"
+				},
+				"a2": {
+					"xpath": "//div[@aria-label='S3-A2']"
+				}
+			},
+			"b": {
+				"xpath": "//div[@aria-label='S3B']",
+				"b1": {
+					"xpath": "//div[@aria-label='S3-B1']"
+				},
+				"b2": {
+					"xpath": "//div[@aria-label='S3-B2']"
+				}
+			},
+			"c": {
+				"xpath": "//div[@aria-label='S3C']",
+				"c1": {
+					"xpath": "//div[@aria-label='S3-C1']"
+				},
+				"c2": {
+					"xpath": "//div[@aria-label='S3-C2']"
+				}
+			}
+		},
+		"s4": {
+			"xpath": "//div[@aria-label='S4']",
+			"a": {
+				"xpath": "//div[@aria-label='S4A']",
+				"a1": {
+					"xpath": "//div[@aria-label='S4-A1']"
+				},
+				"a2": {
+					"xpath": "//div[@aria-label='S4-A2']"
+				}
+			},
+			"b": {
+				"xpath": "//div[@aria-label='S4B']",
+				"b1": {
+					"xpath": "//div[@aria-label='S4-B1']"
+				},
+				"b2": {
+					"xpath": "//div[@aria-label='S4-B2']"
+				}
+			},
+			"c": {
+				"xpath": "//div[@aria-label='S4C']",
+				"c1": {
+					"xpath": "//div[@aria-label='S4-C1']"
+				},
+				"c2": {
+					"xpath": "//div[@aria-label='S4-C2']"
+				}
+			}
+		}
+	}
+}

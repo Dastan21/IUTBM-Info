@@ -1,0 +1,12 @@
+{
+  "name": "edt-info",
+  "version": "1.0.0",
+  "description": "Discord bot to show calendar",
+  "main": "bot.js",
+  "author": "Loïc Degrange",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "mongodb": "^3.6.2",
+    "selenium-webdriver": "^4.0.0-alpha.7"
+  }
+}
