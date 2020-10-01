@@ -16,8 +16,13 @@ const groupes_liste = [
 
 /* Setup Discord bot */
 bot.on('ready', () => {
-  console.log(bot.user.tag + " is online");
-	bot.user.setStatus('online');
+	console.log(bot.user.tag + " is online");
+	bot.user.setPresence({
+		activity: {
+			name: '`edt help`'
+		},
+		status: 'online' }
+	)
 })
 
 
@@ -46,7 +51,7 @@ async function commandProcess(msg) {
 
 	switch (primaryCommand) {
 		case 'show':
-			showEDT(msg, arguments[0]);
+			showEDT(msg, arguments);
 			break;
 		default:
 
@@ -73,19 +78,27 @@ async function msgReply(msg, message){
 		});
 }
 
-async function showEDT(msg, arg) {
-	if (!arg) { msgReply(msg, "le groupe ne peut-être vide"); return; }
-	arg = arg.toLowerCase();
-	if (!groupes_liste.includes(arg)) { msgReply(msg, "le format du semestre/groupe est mal indiqué (voir `edt help show`)"); return; }
-	let annee, semestre, classe, groupe;
-	if (arg[1] < 3) annee = "1e"; else annee = "2e";
-	semestre = "s" + arg[1];
-	classe = arg[3];
-	groupe = classe + arg[4];
-	msgSend(msg, "", new Discord.MessageAttachment(await connectToADE(annee, semestre, classe, groupe), "edt.png"));
+async function showEDT(msg, args) {
+	msg.channel.startTyping();
+	var data = {};
+	var arg_classe = args[0];
+	var arg_semaine = args[1];
+	if (!arg_classe) { msgReply(msg, "le groupe ne peut-être vide"); return; }
+	arg_classe = arg_classe.toLowerCase();
+	if (!groupes_liste.includes(arg_classe)) { msgReply(msg, "le format du semestre/groupe est mal indiqué (voir `edt help show`)."); return; }
+	if (arg_classe[1] < 3) data.annee = "1e"; else data.annee = "2e";
+	data.semestre = "s" + arg_classe[1];
+	data.classe = arg_classe[3];
+	data.groupe = data.classe + arg_classe[4];
+	if (arg_semaine != null) {
+		if (isNaN(arg_semaine) || Number(arg_semaine) < 1 || Number(arg_semaine) > 53) { msgReply(msg, "la semaine doit être un nombre compris entre 1 et 53."); return; }
+		data.semaine = "//button[starts-with(., '"+arg_semaine+"')]";
+	}
+	msgSend(msg, "", new Discord.MessageAttachment(await connectToADE(data), "edt.png"));
+	await msg.channel.stopTyping();
 }
 
-async function connectToADE(annee, semestre, classe, groupe) {
+async function connectToADE(data) {
 	var screenshot = null;
 	let driver = await new Builder()
 		.forBrowser('chrome')
@@ -99,27 +112,34 @@ async function connectToADE(annee, semestre, classe, groupe) {
 		await driver.findElement(By.id('password')).sendKeys(config.cas_auth.password);
 		await driver.findElement(By.name('submit')).click();
 		await driver.sleep(3000);
-		let el = await driver.wait(until.elementLocated(By.xpath(id_groups[annee].xpath)), 10000);
+		let el = await driver.wait(until.elementLocated(By.xpath(id_groups[data.annee].xpath)), 10000);
 		await el.click();
 		await driver.sleep(500);
 		await driver.actions().doubleClick(el).perform();
-		el = await driver.wait(until.elementLocated(By.xpath(id_groups[annee][semestre].xpath)), 5000);
+		el = await driver.wait(until.elementLocated(By.xpath(id_groups[data.annee][data.semestre].xpath)), 5000);
 		await el.click();
 		await driver.sleep(500);
 		await driver.actions().doubleClick(el).perform();
-		el = await driver.wait(until.elementLocated(By.xpath(id_groups[annee][semestre][classe].xpath)), 5000);
+		el = await driver.wait(until.elementLocated(By.xpath(id_groups[data.annee][data.semestre][data.classe].xpath)), 5000);
 		await el.click();
 		await driver.sleep(500);
 		await driver.actions().doubleClick(el).perform();
-		await driver.wait(until.elementLocated(By.xpath(id_groups[annee][semestre][classe][groupe].xpath)), 5000).click();
+		await driver.wait(until.elementLocated(By.xpath(id_groups[data.annee][data.semestre][data.classe][data.groupe].xpath)), 5000).click();
+		if (data.semaine != null) {
+			await driver.sleep(500);
+			await driver.wait(until.elementLocated(By.xpath(data.semaine)), 5000).click();
+		}
+		el = await driver.wait(until.elementLocated(By.xpath(id_groups[data.annee][data.semestre][data.classe].xpath)), 5000);
+		await driver.sleep(500);
+		await driver.actions().keyDown(Key.CONTROL).click(await driver.findElement(By.xpath("//button[text()='Sam']"))).perform();
+		await driver.sleep(500);
+		await driver.actions().keyDown(Key.CONTROL).click(await driver.findElement(By.xpath("//button[text()='Dim']"))).perform();
 		await driver.sleep(2000);
 		await driver.findElement(By.id('x-auto-19')).takeScreenshot()
-			.then(str => {
-				screenshot = Buffer.from(str, "base64");
-			})
+			.then(str => { screenshot = Buffer.from(str, "base64"); })
 			.catch(err => { console.error("couldn't take screenshot: " + err); });
 	} finally {
-		await driver.quit();
+		// await driver.quit();
 		// await console.log("Chrome webdriver disconnected");
 	}
 	return screenshot;
