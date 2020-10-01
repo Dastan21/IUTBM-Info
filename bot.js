@@ -51,7 +51,8 @@ async function commandProcess(msg) {
 
 	switch (primaryCommand) {
 		case 'show':
-			showEDT(msg, arguments);
+			showEDT(msg, arguments)
+			await msg.channel.stopTyping();
 			break;
 		default:
 
@@ -79,7 +80,6 @@ async function msgReply(msg, message){
 }
 
 async function showEDT(msg, args) {
-	msg.channel.startTyping();
 	var data = {};
 	var arg_classe = args[0];
 	var arg_semaine = args[1];
@@ -91,11 +91,12 @@ async function showEDT(msg, args) {
 	data.classe = arg_classe[3];
 	data.groupe = data.classe + arg_classe[4];
 	if (arg_semaine != null) {
-		if (isNaN(arg_semaine) || Number(arg_semaine) < 1 || Number(arg_semaine) > 53) { msgReply(msg, "la semaine doit être un nombre compris entre 1 et 53."); return; }
-		data.semaine = "//button[starts-with(., '"+arg_semaine+"')]";
+		if (isNaN(arg_semaine) || Number(arg_semaine) < 1 || Number(arg_semaine) > 26) { msgReply(msg, "la semaine doit être un nombre compris entre 1 et 26."); return; }
+		let week = ((new Date()).getWeek()+Number(arg_semaine)) % 54;
+		data.semaine = "//button[starts-with(., '"+week+" ')]";
 	}
+	msg.channel.startTyping();
 	msgSend(msg, "", new Discord.MessageAttachment(await connectToADE(data), "edt.png"));
-	await msg.channel.stopTyping();
 }
 
 async function connectToADE(data) {
@@ -144,5 +145,12 @@ async function connectToADE(data) {
 	}
 	return screenshot;
 }
+
+Date.prototype.getWeek = function() {
+	var onejan = new Date(this.getFullYear(),0,1);
+	var today = new Date(this.getFullYear(),this.getMonth(),this.getDate());
+	var dayOfYear = ((today - onejan + 86400000)/86400000);
+	return Math.ceil(dayOfYear/7)
+};
 
 bot.login(config.token);
