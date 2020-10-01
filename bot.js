@@ -13,6 +13,8 @@ const groupes_liste = [
 	"s3-a1", "s3-a2", "s3-b1", "s3-b2", "s3-c1", "s3-c2",
 	"s4-a1", "s4-a2", "s4-b1", "s4-b2", "s4-c1", "s4-c2",
 ];
+var enTraitement = false;
+
 
 /* Setup Discord bot */
 bot.on('ready', () => {
@@ -51,8 +53,12 @@ async function commandProcess(msg) {
 
 	switch (primaryCommand) {
 		case 'show':
-			showEDT(msg, arguments)
-			await msg.channel.stopTyping();
+			if (!enTraitement) {
+				enTraitement = true;
+				showEDT(msg, arguments)
+				await msg.channel.stopTyping();
+			} else
+				msgReply(msg, "veuillez attendre la fin du traitement de la requête précédente.");
 			break;
 		default:
 
@@ -140,7 +146,8 @@ async function connectToADE(data) {
 			.then(str => { screenshot = Buffer.from(str, "base64"); })
 			.catch(err => { console.error("couldn't take screenshot: " + err); });
 	} finally {
-		// await driver.quit();
+		await driver.quit();
+		enTraitement = false;
 		// await console.log("Chrome webdriver disconnected");
 	}
 	return screenshot;
