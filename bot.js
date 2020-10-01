@@ -93,7 +93,7 @@ async function connectToADE(annee, semestre, classe, groupe) {
 		// .setChromeOptions(new Options().windowSize({ width: 1920, height: 1080 })) // DEBUG
 		.build();
 	try {
-		await driver.get('https://sedna.univ-fcomte.fr/direct/myplanning.jsp');
+		await driver.get('https://sedna.univ-fcomte.fr/direct/myplanning.jsp').catch(err => { console.error("couldn't connect to ADE : " + err); });
 		// await console.log("Chrome webdriver connected");
 		await driver.findElement(By.id('username')).sendKeys(config.cas_auth.id);
 		await driver.findElement(By.id('password')).sendKeys(config.cas_auth.password);
@@ -117,7 +117,7 @@ async function connectToADE(annee, semestre, classe, groupe) {
 			.then(str => {
 				screenshot = Buffer.from(str, "base64");
 			})
-			.catch(err => { console.error("Couldn't take screenshot: " + err); });
+			.catch(err => { console.error("couldn't take screenshot: " + err); });
 	} finally {
 		await driver.quit();
 		// await console.log("Chrome webdriver disconnected");
