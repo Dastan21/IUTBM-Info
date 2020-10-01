@@ -102,7 +102,7 @@ async function showEDT(msg, args) {
 		data.semaine = "//button[starts-with(., '"+week+" ')]";
 	}
 	msg.channel.startTyping();
-	msgSend(msg, "", new Discord.MessageAttachment(await connectToADE(data), "edt.png"));
+	msgSend(msg, "Groupe : **" + arg_classe.toUpperCase() + "**", new Discord.MessageAttachment(await connectToADE(data), "edt.png"));
 }
 
 async function connectToADE(data) {
