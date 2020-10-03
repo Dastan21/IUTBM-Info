@@ -29,12 +29,12 @@ bot.on('ready', () => {
 
 
 /* Setup Mongo Database */
-var url = "mongodb://edtinfo:edtinfobot@localhost/edtinfo_db";
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) {
-	if (err) throw err;
-	console.log("Database connected");
-	// db.close();
-});
+// var url = "mongodb://edtinfo:edtinfobot@localhost/edtinfo_db";
+// MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) {
+// 	if (err) throw err;
+// 	console.log("Database connected");
+// 	// db.close();
+// });
 
 
 
