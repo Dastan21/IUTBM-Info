@@ -104,8 +104,8 @@ function showHelp(msg) {
 				value: "`help` `edt` `agenda`"
 			},
 			{
-				name: "[ Agenda ] **(INDISPONIBLE)**",
-				value: "`list` `add` `edit` `remove` `done` `todo`"
+				name: "[ Agenda ]",
+				value: "`list` `add` `edit` `delete` `done` `todo`"
 			}
 		)
 		// .setTimestamp()
@@ -258,12 +258,12 @@ async function agendaManager(msg, args) {
 			break;
 		case 'done':
 			// iut agenda done 5
-			ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
-
+			// ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
+			msgReply(msg, "cette option n'est pas encore implémentée.");
 			break;
 		case 'todo':
 			// iut agenda todo 1
-
+			msgReply(msg, "cette option n'est pas encore implémentée.");
 			break;
 		default:
 			msgReply(msg, "cette commande n'existe pas.");
@@ -284,31 +284,14 @@ async function eventValidator(msg, num, agenda) {
 }
 
 Date.prototype.getWeek = function() {
-
-  // Create a copy of this date object
-  var target  = new Date(this.valueOf());
-
-  // ISO week date weeks start on monday, so correct the day number
-  var dayNr   = (this.getDay() + 6) % 7;
-
-  // Set the target to the thursday of this week so the
-  // target date is in the right year
-  target.setDate(target.getDate() - dayNr + 3);
-
-  // ISO 8601 states that week 1 is the week with january 4th in it
-  var jan4    = new Date(target.getFullYear(), 0, 4);
-
-  // Number of days between target date and january 4th
-  var dayDiff = (target - jan4) / 86400000;
-
-  if(new Date(target.getFullYear(), 0, 1).getDay() < 5) {
-    // Calculate week number: Week 1 (january 4th) plus the
-    // number of weeks between target date and january 4th
-    return 1 + Math.ceil(dayDiff / 7);
-  }
-  else {  // jan 4th is on the next week (so next week is week 1)
-    return Math.ceil(dayDiff / 7);
-  }
+	var target  = new Date(this.valueOf());
+	var dayNr   = (this.getDay() + 6) % 7;
+	target.setDate(target.getDate() - dayNr + 3);
+	var jan4    = new Date(target.getFullYear(), 0, 4);
+	var dayDiff = (target - jan4) / 86400000;
+	if (new Date(target.getFullYear(), 0, 1).getDay() < 5)
+		return 1 + Math.ceil(dayDiff / 7);
+	return Math.ceil(dayDiff / 7);
 };
 
 
