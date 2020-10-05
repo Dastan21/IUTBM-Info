@@ -1,11 +1,11 @@
+const config = require('./config')
 const Discord = require('discord.js')
 const bot = new Discord.Client()
-// var mongo = require('mongodb')
-// var MongoClient = require('mongodb').MongoClient;
+const mongo = require('mongodb')
+// db.createUser({user:"iutbminfo",pwd:"iutbminfobot",roles:[{role:"readWrite", db:"iutbminfo_db"}]})
+const db_client = require('mongodb').MongoClient;
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const { Options } = require('selenium-webdriver/chrome');
-/* Personal imports */
-const config = require('./config')
 const id_groups = require('./id_groups')
 const groupes_liste = [
 	"s1-a1", "s1-a2", "s1-b1", "s1-b2", "s1-c1", "s1-c2", "s1-d1",
@@ -16,7 +16,7 @@ const groupes_liste = [
 var lastReq = null;
 
 
-/* Setup Discord bot */
+/* Setup Discord Bot */
 bot.on('ready', () => {
 	console.log(bot.user.tag + " is online");
 	bot.user.setPresence({
@@ -29,12 +29,12 @@ bot.on('ready', () => {
 
 
 /* Setup Mongo Database */
-// var url = "mongodb://edtinfo:edtinfobot@localhost/edtinfo_db";
-// MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) {
-// 	if (err) throw err;
-// 	console.log("Database connected");
-// 	// db.close();
-// });
+var db;
+db_client.connect(config.db_url, { useNewUrlParser: true, useUnifiedTopology: true }, function (err, dbase) {
+	if (err) throw err;
+	db = dbase.db('iutbminfo_db');
+	console.log("Database connected");
+});
 
 
 
@@ -65,8 +65,8 @@ async function commandProcess(msg) {
 				msgReply(msg, "merci d'attendre la fin du traitement de la requête `" + lastReq + "`.");
 			break;
 		case 'agenda':
-			msgReply(msg, "cette commande n'est pas disponible pour le moment : en cours de création.");
-			// agendaManager(msg, arguments);
+			// msgReply(msg, "cette commande n'est pas disponible pour le moment : en cours de création.");
+			agendaManager(msg, arguments);
 			break;
 		default:
 			msgReply(msg, "cette commande n'existe pas.");
@@ -105,7 +105,7 @@ function showHelp(msg) {
 			},
 			{
 				name: "[ Agenda ] **(INDISPONIBLE)**",
-				value: "`list` `add` `edit` `remove` `done`"
+				value: "`list` `add` `edit` `remove` `done` `todo`"
 			}
 		)
 		// .setTimestamp()
@@ -155,7 +155,7 @@ async function showEDT(msg, args) {
 	var data = {};
 	var arg_classe = args[0];
 	var arg_semaine = args[1];
-	if (!arg_classe) { msgReply(msg, "tu dois choisir un groupe."); lastReq = null; return; }
+	if (!arg_classe) { msgReply(msg, "il faut déinir un groupe."); lastReq = null; return; }
 	arg_classe = arg_classe.toLowerCase();
 	if (!groupes_liste.includes(arg_classe)) { msgReply(msg, "le groupe est incorrect."); lastReq = null; return; }
 	if (arg_classe[1] < 3) data.annee = "1e"; else data.annee = "2e";
@@ -217,15 +217,99 @@ async function connectToADE(data) {
 	return screenshot;
 }
 
+async function agendaManager(msg, args) {
+	var ev = null;
+	const agenda = await db.collection("agenda");
+	switch (args[0]) {
+		case 'list':
+			let list = [];
+			let embed = new Discord.MessageEmbed()
+				.setColor(config.embedColor)
+				.setTitle("Liste des événements")
+				.setFooter("Agenda de " + msg.author.username);
+			var evenements = await agenda.find().forEach(function(ev) {
+				list.push({name:"[" + ev.id + "] " + ev.title + " : le " + ev.date + " à " + ev.time + "\n", value: ev.description});
+			});
+			if (list.length == 0) list = {name: "‎", value: "Il n'y aucun événement."};
+			embed.addFields(list);
+			msgSend(msg, embed);
+			break;
+		case 'add':
+			// iut agenda add {"title":"TitreEvenement","description":"description[...]","date":"08/10/2020","time":"15:00"}
+			ev = args.slice(1).join(' ');
+			ev = ev.slice(0, 1) + "\"id\":"+(await agenda.countDocuments()+1)+"," + ev.slice(1);
+			try { ev = JSON.parse(ev); } catch (e) { msgReply(msg, "la syntaxe de l'événement est incorrect."); return; }
+			await agenda.insertOne(ev);
+			msgReply(msg, "événement ajouté !");
+			break;
+		case 'edit':
+			// iut agenda edit 2 {"title":"EditedTitre","description":"desc2"}
+			ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
+			let edit = args.slice(2).join(' ');
+			try { edit = JSON.parse(edit); } catch (e) { msgReply(msg, "la syntaxe de l'événement est incorrect."); return; }
+			await agenda.updateOne(ev, {$set:edit});
+			msgReply(msg, "événement modifié !");
+			break;
+		case 'delete':
+			// iut agenda delete 3
+			ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
+			await agenda.deleteOne(ev);
+			msgReply(msg, "événement supprimé !");
+			break;
+		case 'done':
+			// iut agenda done 5
+			ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
+
+			break;
+		case 'todo':
+			// iut agenda todo 1
+
+			break;
+		default:
+			msgReply(msg, "cette commande n'existe pas.");
+	}
+}
+
+function createEventJson() {
+	let json = null;
+
+	return json;
+}
+
+async function eventValidator(msg, num, agenda) {
+	if (isNaN(num)) { msgReply(msg, "le numéro de l'événement est incorrect."); return null; }
+	let ev = await agenda.findOne({id: Number(num)});
+	if (ev == null) { msgReply(msg, "l'événement n°" + num + " n'existe pas."); return null; }
+	return ev;
+}
+
 Date.prototype.getWeek = function() {
-	var onejan = new Date(this.getFullYear(),0,1);
-	var today = new Date(this.getFullYear(),this.getMonth(),this.getDate());
-	var dayOfYear = ((today - onejan + 86400000)/86400000);
-	return Math.ceil(dayOfYear/7)
+
+  // Create a copy of this date object
+  var target  = new Date(this.valueOf());
+
+  // ISO week date weeks start on monday, so correct the day number
+  var dayNr   = (this.getDay() + 6) % 7;
+
+  // Set the target to the thursday of this week so the
+  // target date is in the right year
+  target.setDate(target.getDate() - dayNr + 3);
+
+  // ISO 8601 states that week 1 is the week with january 4th in it
+  var jan4    = new Date(target.getFullYear(), 0, 4);
+
+  // Number of days between target date and january 4th
+  var dayDiff = (target - jan4) / 86400000;
+
+  if(new Date(target.getFullYear(), 0, 1).getDay() < 5) {
+    // Calculate week number: Week 1 (january 4th) plus the
+    // number of weeks between target date and january 4th
+    return 1 + Math.ceil(dayDiff / 7);
+  }
+  else {  // jan 4th is on the next week (so next week is week 1)
+    return Math.ceil(dayDiff / 7);
+  }
 };
 
-async function agendaManager() {
-
-}
 
 bot.login(config.token);
