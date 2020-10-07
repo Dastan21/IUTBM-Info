@@ -6,7 +6,7 @@
   "author": "Loïc Degrange",
   "dependencies": {
     "discord.js": "^12.3.1",
-    "mongodb": "^3.6.2",
+    "mongoose": "^5.10.8",
     "selenium-webdriver": "^4.0.0-alpha.7"
   }
 }
