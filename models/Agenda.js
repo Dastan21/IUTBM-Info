@@ -11,7 +11,12 @@ const AgendaSchema = new Schema({
             type: String,
             required: true,
         },
-        _events: []
+		private: {
+			type: Boolean,
+			default: true
+		},
+		_users: [],
+		_events: []
     }
 );
 
