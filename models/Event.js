@@ -21,8 +21,9 @@ const EventSchema = new Schema({
 		time: {
 			type: Date
 		},
-		done: {
-			type: Boolean
+		state: {
+			type: String,
+			default: "todo"
 		}
     }
 );

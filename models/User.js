@@ -11,7 +11,7 @@ const UserSchema = new Schema({
             type: String,
             required: true,
         },
-        _group: []
+        _agendas: []
     }
 );
 
