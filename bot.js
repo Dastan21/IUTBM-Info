@@ -42,9 +42,6 @@ async function commandProcess(msg) {
 			console.log(arguments.join(' ').replace(/["]/g,''));
 			break;
 		case 'help':
-			if (arguments.length == 0)
-				await showHelp(msg);
-			else
 				await showMoreHelp(msg, arguments);
 			break;
 		case 'edt':
@@ -59,168 +56,165 @@ async function commandProcess(msg) {
 	}
 }
 
-async function showHelp(msg) {
-	let embed = await createEmbed();
-	embed.setTitle("PANNEAU D'AIDE - GÉNÉRAL")
-		.setDescription("‎IUTBM-Info est un bot Discord qui permet de voir les EDT sur ADE et de gérer des agendas.\n‎")
-		.addFields({ name: "Commandes principales :", value: "`help` `edt` `agenda`\n‎" })
-	msgSend(msg, embed)
-}
-
 async function showMoreHelp(msg, cmds) {
 	let embed = await createEmbed(msg);
-	switch (cmds[0]) {
-		/* Basic commands */
-		case "help":
-			embed.setTitle("PANNEAU D'AIDE - HELP")
-				.setDescription("Afficher les informations relatives à la commande.\n‎")
-				.addFields(
-					{ name: "Utilisation", value: "`iut help <MAIN_COMMAND> <SUB_COMMAND>`\n‎" },
-					{ name: "Arguments", value: "`<MAIN_COMMAND>` : **string**\n`<SUB_COMMAND>` : **string**\n‎" },
-					{ name: "Exemples", value: "`iut help edt`\n`iut help edt show`\n‎" }
-				);
-			break;
-		case "edt":
-			switch (cmds[1]) {
-				case "show":
-					embed.setTitle("PANNEAU D'AIDE - EDT > SHOW")
-						.setDescription("Afficher l'emploi du temps du groupe.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut edt show <GROUPE> <SEMAINE>`\n‎" },
-							{ name: "Arguments", value: "`<GROUPE>` : **string** ∈ [S1-A1, S4-C2]\n`<SEMAINE>` : **integer** ∈ [0, 8] *(défaut = 0)*\n‎" },
-							{ name: "Exemples", value: "`iut edt show`\n`iut edt show "+randomInt(1,8)+"`\n`iut edt show "+randomGroupe()+"`\n`iut edt show "+randomGroupe()+" "+randomInt(1,8)+"`\n‎" }
-						);
-					break;
-				case "set":
-					embed.setTitle("PANNEAU D'AIDE - EDT > SET")
-						.setDescription("Définir .\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut edt set <GROUPE>`\n‎" },
-							{ name: "Arguments", value: "`<GROUPE>` : **string** ∈ [S1-A1, S4-C2]\n‎" },
-							{ name: "Exemple", value: "`iut edt set "+randomGroupe()+"`\n‎" }
-						);
-					break;
-				default:
-					embed.setTitle("PANNEAU D'AIDE - EDT")
-						.setDescription("Afficher l'emploi du temps d'un groupe et définir un groupe pour l'utilisateur.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut edt <EDT_ACTION>`\n‎" },
-							{ name: "Arguments", value: "`<EDT_ACTION>` : `show` `set`\n‎" },
-							{ name: "Exemples", value: "`iut edt "+randomGroupe()+"`\n`iut edt "+randomGroupe()+" "+randomInt(1,8)+"`\n‎" }
-						);
-			}
-			break;
-		case "agenda":
-			switch (cmds[1]) {
-				case "list":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > LIST")
-						.setDescription("Afficher la liste des agendas dont l'utilisateur a accès.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda list`\n‎" }
-						);
-					break;
-				case "create":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > CREATE")
-						.setDescription("Créer un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda create \"<NAME>\" <PRIVATE>`\n‎" },
-							{ name: "Arguments", value: "`<NAME>` : **string** < 40 caractères\n`<PRIVATE>` : **boolean** *(défaut = false)*\n‎" },
-							{ name: "Exemples", value: "`iut agenda create \"Agenda des "+randomGroupe().slice(0,-1)+"\"`\n`iut agenda create \"Agenda des "+randomGroupe().slice(0,-1)+"\" true`\n‎" }
-						);
-					break;
-				case "delete":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > DELETE")
-						.setDescription("Supprimer un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda delete <ID_AGENDA>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda delete "+randomInt(1,9)+"`\n‎" }
-						);
-					break;
-				case "join":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > JOIN")
-						.setDescription("Rejoindre un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda join <ID_AGENDA>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda join "+randomInt(1,9)+"`\n‎" }
-						);
-					break;
-				case "leave":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > LEAVE")
-						.setDescription("Quitter un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda leave <ID_AGENDA>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda leave "+randomInt(1,9)+"`\n‎" }
-						);
-					break;
-				case "show":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > SHOW")
-						.setDescription("Afficher tous les événements d'un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> show`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" show`‎" }
-						);
-					break;
-				case "add":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > ADD")
-						.setDescription("Ajouter un événement dans un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> add \"<TITLE>\" \"<DESCRIPTION>\" <DATE>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
-							{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomInt(1,9)+" add \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(2,4)+"\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
-						);
-					break;
-				case "edit":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > EDIT")
-						.setDescription("Modifier un événement d'un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> edit \"<TITLE>\" \"<DESCRIPTION>\" <DATE>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
-							{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" \"Faire exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" \"Lire cours\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
-						);
-					break;
-				case "remove":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > REMOVE")
-						.setDescription("Supprimer un événement d'un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> remove <ID_EVENT>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" remove "+randomInt(1,9)+"`" }
-						);
-					break;
-					case "todo":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > TODO")
-						.setDescription("Établir un événement comme 'à faire' d'un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> todo <ID_EVENT>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" todo "+randomInt(1,9)+"`" }
-						);
-					break;
-				case "done":
-					embed.setTitle("PANNEAU D'AIDE - AGENDA > DONE")
-						.setDescription("Établir un événement comme 'terminé' d'un agenda.\n‎")
-						.addFields(
-							{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> done <ID_EVENT>`\n‎" },
-							{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
-							{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" done "+randomInt(1,9)+"`" }
-						);
-					break;
-				default:
-					embed.setTitle("PANNEAU D'AIDE - AGENDA")
-						.setDescription("Gérer un ou plusieurs agendas.\n‎")
-						.addFields(
-							{ name: "Utilisations", value: "`iut agenda <AGENDA_ACTION>`\n`iut agenda <ID_AGENDA> <EVENT_ACTION>`\n‎" },
-							{ name: "Arguments", value: "`<AGENDA_ACTION>` : `list` `create` `delete` `join` `leave`\n`<ID_AGENDA>` : **integer**\n`<EVENT_ACTION>` : `show` `add` `edit` `remove` `done` `todo`\n‎" }
-						);
+	if (cmds.length == 0) {
+		embed.setTitle("PANNEAU D'AIDE - GÉNÉRAL")
+			.setDescription("‎IUTBM-Info est un bot Discord qui permet de voir les EDT sur ADE et de gérer des agendas.\n‎")
+			.addFields({ name: "Commandes principales :", value: "`help` `edt` `agenda`\n‎" })
+	} else {
+		switch (cmds[0]) {
+			/* Basic commands */
+			case "help":
+				embed.setTitle("PANNEAU D'AIDE - HELP")
+					.setDescription("Afficher les informations relatives à la commande.\n‎")
+					.addFields(
+						{ name: "Utilisation", value: "`iut help <MAIN_COMMAND> <SUB_COMMAND>`\n‎" },
+						{ name: "Arguments", value: "`<MAIN_COMMAND>` : **string**\n`<SUB_COMMAND>` : **string**\n‎" },
+						{ name: "Exemples", value: "`iut help edt`\n`iut help edt show`\n‎" }
+					);
+				break;
+			case "edt":
+				switch (cmds[1]) {
+					case "show":
+						embed.setTitle("PANNEAU D'AIDE - EDT > SHOW")
+							.setDescription("Afficher l'emploi du temps du groupe.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut edt show <GROUPE> <SEMAINE>`\n‎" },
+								{ name: "Arguments", value: "`<GROUPE>` : **string** ∈ [S1-A1, S4-C2]\n`<SEMAINE>` : **integer** ∈ [0, 8] *(défaut = 0)*\n‎" },
+								{ name: "Exemples", value: "`iut edt show`\n`iut edt show "+randomInt(1,8)+"`\n`iut edt show "+randomGroupe()+"`\n`iut edt show "+randomGroupe()+" "+randomInt(1,8)+"`\n‎" }
+							);
+						break;
+					case "set":
+						embed.setTitle("PANNEAU D'AIDE - EDT > SET")
+							.setDescription("Définir .\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut edt set <GROUPE>`\n‎" },
+								{ name: "Arguments", value: "`<GROUPE>` : **string** ∈ [S1-A1, S4-C2]\n‎" },
+								{ name: "Exemple", value: "`iut edt set "+randomGroupe()+"`\n‎" }
+							);
+						break;
+					default:
+						embed.setTitle("PANNEAU D'AIDE - EDT")
+							.setDescription("Afficher l'emploi du temps d'un groupe et définir un groupe pour l'utilisateur.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut edt <EDT_ACTION>`\n‎" },
+								{ name: "Arguments", value: "`<EDT_ACTION>` : `show` `set`\n‎" }
+							);
 				}
-			break;
-		default:
-			msgReply(msg, "cette commande n'existe pas.");
-			return;
+				break;
+			case "agenda":
+				switch (cmds[1]) {
+					case "list":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > LIST")
+							.setDescription("Afficher la liste des agendas dont l'utilisateur a accès.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda list`\n‎" }
+							);
+						break;
+					case "create":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > CREATE")
+							.setDescription("Créer un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda create \"<NAME>\" <PRIVATE>`\n‎" },
+								{ name: "Arguments", value: "`<NAME>` : **string** < 40 caractères\n`<PRIVATE>` : **boolean** *(défaut = false)*\n‎" },
+								{ name: "Exemples", value: "`iut agenda create \"Agenda des "+randomGroupe().slice(0,-1)+"\"`\n`iut agenda create \"Agenda des "+randomGroupe().slice(0,-1)+"\" true`\n‎" }
+							);
+						break;
+					case "delete":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > DELETE")
+							.setDescription("Supprimer un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda delete <ID_AGENDA>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda delete "+randomInt(1,9)+"`\n‎" }
+							);
+						break;
+					case "join":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > JOIN")
+							.setDescription("Rejoindre un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda join <ID_AGENDA>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda join "+randomInt(1,9)+"`\n‎" }
+							);
+						break;
+					case "leave":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > LEAVE")
+							.setDescription("Quitter un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda leave <ID_AGENDA>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda leave "+randomInt(1,9)+"`\n‎" }
+							);
+						break;
+					case "show":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > SHOW")
+							.setDescription("Afficher tous les événements d'un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> show`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" show`‎" }
+							);
+						break;
+					case "add":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > ADD")
+							.setDescription("Ajouter un événement dans un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> add \"<TITLE>\" \"<DESCRIPTION>\" <DATE>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
+								{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomInt(1,9)+" add \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(2,4)+"\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
+							);
+						break;
+					case "edit":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > EDIT")
+							.setDescription("Modifier un événement d'un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> edit \"<TITLE>\" \"<DESCRIPTION>\" <DATE>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
+								{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" \"Faire exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" \"Lire cours\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
+							);
+						break;
+					case "remove":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > REMOVE")
+							.setDescription("Supprimer un événement d'un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> remove <ID_EVENT>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" remove "+randomInt(1,9)+"`" }
+							);
+						break;
+						case "todo":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > TODO")
+							.setDescription("Établir un événement comme 'à faire' d'un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> todo <ID_EVENT>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" todo "+randomInt(1,9)+"`" }
+							);
+						break;
+					case "done":
+						embed.setTitle("PANNEAU D'AIDE - AGENDA > DONE")
+							.setDescription("Établir un événement comme 'terminé' d'un agenda.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> done <ID_EVENT>`\n‎" },
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" done "+randomInt(1,9)+"`" }
+							);
+						break;
+					default:
+						embed.setTitle("PANNEAU D'AIDE - AGENDA")
+							.setDescription("Gérer un ou plusieurs agendas.\n‎")
+							.addFields(
+								{ name: "Utilisations", value: "`iut agenda <AGENDA_ACTION>`\n`iut agenda <ID_AGENDA> <EVENT_ACTION>`\n‎" },
+								{ name: "Arguments", value: "`<AGENDA_ACTION>` : `list` `create` `delete` `join` `leave`\n`<ID_AGENDA>` : **integer**\n`<EVENT_ACTION>` : `show` `add` `edit` `remove` `done` `todo`\n‎" }
+							);
+					}
+				break;
+			default:
+				msgReply(msg, "cette commande n'existe pas.");
+				return;
+		}
 	}
 	msgSend(msg, embed)
 }
