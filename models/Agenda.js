@@ -15,8 +15,12 @@ const AgendaSchema = new Schema({
 			type: Boolean,
 			default: true
 		},
-		_users: [],
-		_events: []
+		_users: {
+			type: Array
+		},
+		_events: {
+			type: Array
+		}
     }
 );
 

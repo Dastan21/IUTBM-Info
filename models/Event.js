@@ -18,9 +18,6 @@ const EventSchema = new Schema({
 		date: {
 			type: Date
 		},
-		time: {
-			type: Date
-		},
 		state: {
 			type: String,
 			default: "todo"

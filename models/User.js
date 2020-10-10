@@ -11,7 +11,12 @@ const UserSchema = new Schema({
             type: String,
             required: true,
         },
-        _agendas: []
+		group: {
+			type: String
+		},
+        _agendas: {
+			type: Array
+		}
     }
 );
 
