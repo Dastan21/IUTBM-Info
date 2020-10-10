@@ -237,10 +237,10 @@ async function edtManager(msg, args) {
 			if (args.length == 1) { await showMoreHelp(msg, ["edt"].concat(args)); return; }
 			group = args[1].toLowerCase();
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
-			if (user_doc.group === group) { msgReply(msg, "tu es déjà dans le groupe `" + group.toUpperCase() + "`"); return; }
+			if (user_doc.group === group) { msgReply(msg, "tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
 			if (user_doc == null) 	user_doc = new User({id: msg.author.id, username: msg.author.username, group: group});
 			else 					await User.updateOne(user_doc, {group: group});
-			msgReply(msg, "tu es désormais dans le groupe `" + group.toUpperCase() + "`");
+			msgReply(msg, "tu es désormais dans le groupe `" + group.toUpperCase() + "`.");
 			await user_doc.save();
 			break;
 	}
