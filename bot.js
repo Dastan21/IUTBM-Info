@@ -1,4 +1,4 @@
-const config = require('./configs/config.json')
+const config = require('./configs/config')
 const Discord = require('discord.js')
 const bot = new Discord.Client()
 const mongoose = require('mongoose')
@@ -6,9 +6,9 @@ const mongoose = require('mongoose')
 const db_client = require('mongodb').MongoClient;
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const { Options } = require('selenium-webdriver/chrome');
-const Agenda = require('./models/Agenda.js')
-const Event = require('./models/Event.js')
-const User = require('./models/User.js')
+const Agenda = require('./models/Agenda')
+const Event = require('./models/Event')
+const User = require('./models/User')
 const groups = require('./configs/groups')
 var lastReq = null;
 
