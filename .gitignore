@@ -2,3 +2,4 @@ node_modules/
 configs/
 chromedriver.exe
 debug.log
+run.sh
