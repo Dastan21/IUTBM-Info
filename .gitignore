@@ -1,4 +1,4 @@
 node_modules/
-configs
+configs/
 chromedriver.exe
 debug.log
