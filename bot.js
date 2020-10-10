@@ -2,8 +2,6 @@ const config = require('./configs/config')
 const Discord = require('discord.js')
 const bot = new Discord.Client()
 const mongoose = require('mongoose')
-// db.createUser({user:"iutbminfo",pwd:"iutbminfobot",roles:[{role:"readWrite", db:"iutbminfo_db"}]})
-const db_client = require('mongodb').MongoClient;
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const { Options } = require('selenium-webdriver/chrome');
 const Agenda = require('./models/Agenda')
