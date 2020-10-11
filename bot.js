@@ -34,36 +34,33 @@ async function commandProcess(msg) {
 	let rawCommand = msg.content;
     let fullCommand = rawCommand.substr(config.prefix.length+1);
     let splitCommand = fullCommand.split(' ');
-    let primaryCommand = splitCommand[0].toLowerCase();
+    let primaryCommand = splitCommand[0];
     let arguments = splitCommand.slice(1);
 
-	switch (primaryCommand) {
-		case 'debug':
-			console.log(arguments.join(' ').replace(/["]/g,''));
-			break;
+	switch (primaryCommand.toLowerCase()) {
 		case 'help':
-				await showMoreHelp(msg, arguments);
+			await showHelp(msg, arguments);
 			break;
 		case 'edt':
-				edtManager(msg, arguments);
+			edtManager(msg, arguments);
 			break;
 		case 'agenda':
-			msgReply(msg, "désolé la commande n'est pas disponible pour le moment.");
-			// agendaManager(msg, arguments);
+			// msgReply(msg, "désolé la commande n'est pas disponible pour le moment.");
+			agendaManager(msg, arguments);
 			break;
 		default:
 			msgReply(msg, "cette commande n'existe pas.");
 	}
 }
 
-async function showMoreHelp(msg, cmds) {
-	let embed = await createEmbed(msg);
+function showHelp(msg, cmds) {
+	let embed = createEmbed(msg);
 	if (cmds.length == 0) {
 		embed.setTitle("PANNEAU D'AIDE - GÉNÉRAL")
 			.setDescription("‎IUTBM-Info est un bot Discord qui permet de voir les EDT sur ADE et de gérer des agendas.\n‎")
 			.addFields({ name: "Commandes principales :", value: "`help` `edt` `agenda`\n‎" })
 	} else {
-		switch (cmds[0]) {
+		switch (cmds[0].toLowerCase()) {
 			/* Basic commands */
 			case "help":
 				embed.setTitle("PANNEAU D'AIDE - HELP")
@@ -75,7 +72,7 @@ async function showMoreHelp(msg, cmds) {
 					);
 				break;
 			case "edt":
-				switch (cmds[1]) {
+				switch (cmds[1].toLowerCase()) {
 					case "show":
 						embed.setTitle("PANNEAU D'AIDE - EDT > SHOW")
 							.setDescription("Afficher l'emploi du temps du groupe.\n‎")
@@ -87,7 +84,7 @@ async function showMoreHelp(msg, cmds) {
 						break;
 					case "set":
 						embed.setTitle("PANNEAU D'AIDE - EDT > SET")
-							.setDescription("Définir .\n‎")
+							.setDescription("Attribuer un groupe à l'utilisateur.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut edt set <GROUPE>`\n‎" },
 								{ name: "Arguments", value: "`<GROUPE>` : **string** ∈ [S1-A1, S4-C2]\n‎" },
@@ -104,7 +101,7 @@ async function showMoreHelp(msg, cmds) {
 				}
 				break;
 			case "agenda":
-				switch (cmds[1]) {
+				switch (cmds[1].toLowerCase()) {
 					case "list":
 						embed.setTitle("PANNEAU D'AIDE - AGENDA > LIST")
 							.setDescription("Afficher la liste des agendas dont l'utilisateur a accès.\n‎")
@@ -126,8 +123,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Supprimer un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda delete <ID_AGENDA>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda delete "+randomInt(1,9)+"`\n‎" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n‎" },
+								{ name: "Exemple", value: "`iut agenda delete "+randomId()+"`\n‎" }
 							);
 						break;
 					case "join":
@@ -135,8 +132,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Rejoindre un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda join <ID_AGENDA>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda join "+randomInt(1,9)+"`\n‎" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n‎" },
+								{ name: "Exemple", value: "`iut agenda join "+randomId()+"`\n‎" }
 							);
 						break;
 					case "leave":
@@ -144,8 +141,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Quitter un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda leave <ID_AGENDA>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda leave "+randomInt(1,9)+"`\n‎" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n‎" },
+								{ name: "Exemple", value: "`iut agenda leave "+randomId()+"`\n‎" }
 							);
 						break;
 					case "show":
@@ -153,8 +150,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Afficher tous les événements d'un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> show`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" show`‎" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomId()+" show`‎" }
 							);
 						break;
 					case "add":
@@ -162,8 +159,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Ajouter un événement dans un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> add \"<TITLE>\" \"<DESCRIPTION>\" <DATE>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
-								{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomInt(1,9)+" add \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(2,4)+"\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
+								{ name: "Exemples", value: "`iut agenda "+randomId()+" add \"TD Algo\" \"Finir exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomId()+" add \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomId()+" add \"TD Algo\" \"Finir exo "+randomInt(2,4)+"\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
 							);
 						break;
 					case "edit":
@@ -171,8 +168,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Modifier un événement d'un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> edit \"<TITLE>\" \"<DESCRIPTION>\" <DATE>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
-								{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" \"Faire exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomInt(1,9)+" edit \"TD Algo\" \"Lire cours\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n`<ID_EVENT>` : **integer**\n`<TITLE>` : **string** < 40 caractères\n`<DESCRIPTION>` : **string** < 300 caractères *(défaut = null)*\n`<DATE>` : **string** JJ/MM *(défaut = null)*\n‎" },
+								{ name: "Exemples", value: "`iut agenda "+randomId()+" edit \"TD Algo\" \"Faire exo "+randomInt(1,3)+"\\nRelire cours\"`\n`iut agenda "+randomId()+" edit \"TD Algo\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n`iut agenda "+randomId()+" edit \"TD Algo\" \"Lire cours\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"`\n‎" }
 							);
 						break;
 					case "remove":
@@ -180,8 +177,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Supprimer un événement d'un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> remove <ID_EVENT>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" remove "+randomInt(1,9)+"`" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n`<ID_EVENT>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomId()+" remove "+randomInt(1,9)+"`" }
 							);
 						break;
 						case "todo":
@@ -189,8 +186,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Établir un événement comme 'à faire' d'un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> todo <ID_EVENT>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" todo "+randomInt(1,9)+"`" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n`<ID_EVENT>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomId()+" todo "+randomInt(1,9)+"`" }
 							);
 						break;
 					case "done":
@@ -198,8 +195,8 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Établir un événement comme 'terminé' d'un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda <ID_AGENDA> done <ID_EVENT>`\n‎" },
-								{ name: "Arguments", value: "`<ID_AGENDA>` : **integer**\n`<ID_EVENT>` : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" done "+randomInt(1,9)+"`" }
+								{ name: "Arguments", value: "`<ID_AGENDA>` : **string**\n`<ID_EVENT>` : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda "+randomId()+" done "+randomInt(1,9)+"`" }
 							);
 						break;
 					default:
@@ -207,7 +204,7 @@ async function showMoreHelp(msg, cmds) {
 							.setDescription("Gérer un ou plusieurs agendas.\n‎")
 							.addFields(
 								{ name: "Utilisations", value: "`iut agenda <AGENDA_ACTION>`\n`iut agenda <ID_AGENDA> <EVENT_ACTION>`\n‎" },
-								{ name: "Arguments", value: "`<AGENDA_ACTION>` : `list` `create` `delete` `join` `leave`\n`<ID_AGENDA>` : **integer**\n`<EVENT_ACTION>` : `show` `add` `edit` `remove` `done` `todo`\n‎" }
+								{ name: "Arguments", value: "`<AGENDA_ACTION>` : `list` `create` `delete` `join` `leave`\n`<ID_AGENDA>` : **string**\n`<EVENT_ACTION>` : `show` `add` `edit` `remove` `done` `todo`\n‎" }
 							);
 					}
 				break;
@@ -220,10 +217,10 @@ async function showMoreHelp(msg, cmds) {
 }
 
 async function edtManager(msg, args) {
-	if (args.length == 0) { await showMoreHelp(msg, ["edt"]); return; }
+	if (args.length == 0) { await showHelp(msg, ["edt"]); return; }
 	var user_doc = await User.findOne({ id: msg.author.id });
 	let group;
-	switch (args[0]) {
+	switch (args[0].toLowerCase()) {
 		case "show":
 			group = (user_doc != null && user_doc.group != undefined) ? user_doc.group : args[1];
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
@@ -234,8 +231,7 @@ async function edtManager(msg, args) {
 			msgSend(msg, "Groupe : **" + group.toUpperCase() + "**", new Discord.MessageAttachment(await getEDTFromADE(getEDTData(group, weeks_ahead)), "edt.png"));
 			break;
 		case "set":
-			if (args.length == 1) { await showMoreHelp(msg, ["edt"].concat(args)); return; }
-			group = args[1].toLowerCase();
+			if (args.length == 1) { await showHelp(msg, ["edt"].concat(args)); return; }
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
 			if (user_doc != null && user_doc.group === group) { msgReply(msg, "tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
 			if (user_doc == null) 	user_doc = new User({id: msg.author.id, username: msg.author.username, group: group});
@@ -243,9 +239,10 @@ async function edtManager(msg, args) {
 			msgReply(msg, "tu es désormais dans le groupe `" + group.toUpperCase() + "`.");
 			await user_doc.save();
 			break;
+		default:
+			msgReply(msg, "cette commande n'existe pas.");
 	}
 }
-
 function getEDTData(group, weeks_ahead) {
 	let data = {};
 	/* Group */
@@ -257,7 +254,6 @@ function getEDTData(group, weeks_ahead) {
 	data.semaine = ((new Date()).getWeek() + Number(weeks_ahead)) % 54;
 	return data;
 }
-
 async function getEDTFromADE(data) {
 	var screenshot = null;
 	let driver = await new Builder()
@@ -305,81 +301,148 @@ async function getEDTFromADE(data) {
 }
 
 async function agendaManager(msg, args) {
-	if (args.length == 0) { await showMoreHelp(msg, ["agenda"]); return; }
-	if (args.length == 1) { await showMoreHelp(msg, ["agenda"].concat(args)); return; }
-	var ev = null;
-	const agenda = await db.collection("agenda");
-	const user = await db.collection("user");
-	let usr = await user.findOne({id: msg.author.id});
-	if (usr == null) await user.insertOne({
-		id: msg.author.id,
-
-	});
-	switch (args[0]) {
+	var user_doc, agenda_doc, user_pop, agenda_pop;
+	if (args.length == 0) { await showHelp(msg, ["agenda"]); return; }
+	user_doc = await User.findOne({ id: msg.author.id });
+	if (user_doc == null) user_doc = new User({ id: msg.author.id, username: msg.author.username });
+	let i, j;
+	switch (args[0].toLowerCase()) {
 		case 'list':
-			let list = [];
-			let embed = new Discord.MessageEmbed()
-				.setColor(config.embedColor)
-				.setTitle("Liste des événements")
-				.setFooter("Agenda de " + msg.author.username, msg.author.displayAvatarURL({ format: 'png', dynamic: true}));
-			var evenements = await agenda.find().forEach(function(ev) {
-				list.push({name:"[" + ev.id + "] " + ev.title + " : le " + ev.date + " à " + ev.time + "\n", value: ev.description});
-			});
-			if (list.length == 0) list = {name: "‎", value: "Il n'y aucun événement."};
-			embed.addFields(list);
+			let embed = createEmbed(msg);
+			embed.setTitle("Liste des agendas de " + msg.author.username).setDescription("‎");
+			user_pop = await User.findOne({ id: msg.author.id }).populate('_agendas');
+			if (user_doc._agendas.length == 0 || user_pop == null) embed.addField("Tu n'as pas encore d'agenda.", "‎");
+			if (user_pop != null) {
+				for (i = 0; i < user_pop._agendas.length; i++) {
+					let users_str = "";
+					agenda_pop = await Agenda.findOne({ _id: user_pop._agendas[i]._id }).populate('_users');
+					for (j = 0; j < agenda_pop._users.length && j < 5; j++)
+						users_str += ", " + agenda_pop._users[j].username;
+					users_str = users_str.slice(2);
+					if (agenda_pop._users.length > 5) users_str += " [" + (agenda_pop._users.length-5) + "]";
+					users_str += "\n‎";
+					embed.addField(user_pop._agendas[i].name, "["+user_pop._agendas[i].id+"] "+users_str);
+				}
+			}
 			msgSend(msg, embed);
 			break;
+		case 'create':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
+			let arguments = args.slice(1).join(' ');
+			arguments = arguments.split('" ');
+			if ((arguments.length == 1 && (!arguments[0].startsWith('"') || !arguments[0].endsWith('"'))) || (arguments.length > 1 && (arguments[1] !== 'true' && arguments[1] !== 'false'))) { msgReply(msg, "le titre est invalide."); return; }
+			arguments[0] = arguments[0].replace(/"/gm, '');
+			let err = true;
+			let data = { name: arguments[0], _users: [user_doc._id] };
+			if (arguments.length > 1) data.private = arguments[1];
+			do {
+				try {
+					data.id = randomId();
+					agenda_doc = new Agenda(data);
+					await agenda_doc.save();
+					user_doc._agendas.push(agenda_doc._id);
+					await user_doc.save();
+					err = false;
+				} catch (e) {}
+			} while (err);
+			msgReply(msg, "l'agenda `" + data.name + "` a été créé.");
+			break;
+		case 'delete':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
+			agenda_doc = await Agenda.findOne({ id: args[1] });
+			if (agenda_doc == null) { msgReply(msg, "il n'y a pas d'agenda avec cet identifiant."); return; }
+			i = 0; while (i < user_doc._agendas.length && user_doc._agendas[i]._id === agenda_doc._id) { i++; }
+			if (i == user_doc._agendas.length) { msgReply(msg, "tu ne peux pas supprimer cet agenda."); return; }
+			agenda_pop = await Agenda.findOne(agenda_doc).populate('_users');
+			await Agenda.deleteOne(agenda_doc);
+			for (i = 0; i < agenda_pop._users.length; i++) {
+				agenda_pop._users[i]._agendas.splice(agenda_pop._users[i]._agendas.indexOf(agenda_doc._id), 1);
+				await agenda_pop._users[i].save();
+			}
+			msgReply(msg, "l'agenda `" + agenda_doc.name + "` a été supprimé.");
+			break;
+		case 'join':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
+			agenda_doc = await Agenda.findOne({id: args[1] });
+			if (agenda_doc == null) { msgReply(msg, "il n'y a pas d'agenda avec cet identifiant."); return; }
+			i = 0; while (i < user_doc._agendas.length && String(user_doc._agendas[i]._id) != String(agenda_doc._id)) { i++; }
+			if (i != user_doc._agendas.length) { msgReply(msg, "tu as déjà rejoint cet agenda."); return; }
+			agenda_doc._users.push(user_doc._id);
+			user_doc._agendas.push(agenda_doc._id);
+			await agenda_doc.save();
+			await user_doc.save();
+			msgReply(msg, "tu as rejoint l'agenda `" + agenda_doc.name + "`.");
+			break;
+		case 'leave':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
+			agenda_doc = await Agenda.findOne({id: args[1] });
+			if (agenda_doc == null) { msgReply(msg, "il n'y a pas d'agenda avec cet identifiant."); return; }
+			i = 0; while (i < user_doc._agendas.length && user_doc._agendas[i]._id === agenda_doc._id) { i++; }
+			if (i == user_doc._agendas.length) { msgReply(msg, "tu n'a pas agenda avec cet identifiant."); return; }
+			agenda_doc._users.splice(agenda_doc._users.indexOf(user_doc._id), 1);
+			user_doc._agendas.splice(user_doc._agendas.indexOf(agenda_doc._id), 1);
+			await agenda_doc.save();
+			await user_doc.save();
+			if (user_doc._agendas.length == 0) {
+				await Agenda.deleteOne(agenda_doc);
+				msgReply(msg, "l'agenda `" + agenda_doc.name + "` a été supprimé.");
+			} else
+				msgReply(msg, "tu as quitté l'agenda `" + agenda_doc.name + "`.");
+			break;
+		case 'show':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
+			// let list = [];
+			// let embed = new Discord.MessageEmbed()
+			// 	.setColor(config.embedColor)
+			// 	.setTitle("Liste des événements")
+			// 	.setFooter("Agenda de " + msg.author.username, msg.author.displayAvatarURL({ format: 'png', dynamic: true}));
+			// var evenements = await agenda.find().forEach(function(ev) {
+			// 	list.push({name:"[" + ev.id + "] " + ev.title + " : le " + ev.date + " à " + ev.time + "\n", value: ev.description});
+			// });
+			// if (list.length == 0) list = {name: "‎", value: "Il n'y aucun événement."};
+			// embed.addFields(list);
+			// msgSend(msg, embed);
+			break;
 		case 'add':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
 			// iut agenda add {"title":"TitreEvenement","description":"description[...]","date":"08/10/2020","time":"15:00"}
-			ev = args.slice(1).join(' ');
-			ev = ev.slice(0, 1) + "\"id\":"+(await agenda.countDocuments()+1)+"," + ev.slice(1);
-			try { ev = JSON.parse(ev); } catch (e) { msgReply(msg, "la syntaxe de l'événement est incorrect."); return; }
-			await agenda.insertOne(ev);
-			msgReply(msg, "événement ajouté !");
+			// ev = args.slice(1).join(' ');
+			// ev = ev.slice(0, 1) + "\"id\":"+(await agenda.countDocuments()+1)+"," + ev.slice(1);
+			// try { ev = JSON.parse(ev); } catch (e) { msgReply(msg, "la syntaxe de l'événement est incorrect."); return; }
+			// await agenda.insertOne(ev);
+			// msgReply(msg, "événement ajouté !");
 			break;
 		case 'edit':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
 			// iut agenda edit 2 {"title":"EditedTitre","description":"desc2"}
-			ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
-			let edit = args.slice(2).join(' ');
-			try { edit = JSON.parse(edit); } catch (e) { msgReply(msg, "la syntaxe de l'événement est incorrect."); return; }
-			await agenda.updateOne(ev, {$set:edit});
-			msgReply(msg, "événement modifié !");
+			// ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
+			// let edit = args.slice(2).join(' ');
+			// try { edit = JSON.parse(edit); } catch (e) { msgReply(msg, "la syntaxe de l'événement est incorrect."); return; }
+			// await agenda.updateOne(ev, {$set:edit});
+			// msgReply(msg, "événement modifié !");
 			break;
 		case 'remove':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
 			// iut agenda remove 3
-			ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
-			await agenda.deleteOne(ev);
-			msgReply(msg, "événement supprimé !");
+			// ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
+			// await agenda.deleteOne(ev);
+			// msgReply(msg, "événement supprimé !");
 			break;
 		case 'done':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
 			// iut agenda done 5
 			// ev = await eventValidator(msg, args[1], agenda); if (ev == null) return;
-			msgReply(msg, "cette option n'est pas encore implémentée.");
+			// msgReply(msg, "cette option n'est pas encore implémentée.");
 			break;
 		case 'todo':
+			if (args.length == 1) { await showHelp(msg, ["agenda"].concat(args)); return; }
 			// iut agenda todo 1
-			msgReply(msg, "cette option n'est pas encore implémentée.");
+			// msgReply(msg, "cette option n'est pas encore implémentée.");
 			break;
 		default:
 			msgReply(msg, "cette commande n'existe pas.");
 	}
 }
-
-function createEventJson() {
-	let json = null;
-
-	return json;
-}
-
-async function eventValidator(msg, num, agenda) {
-	if (isNaN(num)) { msgReply(msg, "le numéro de l'événement est incorrect."); return null; }
-	let ev = await agenda.findOne({id: Number(num)});
-	if (ev == null) { msgReply(msg, "l'événement n°" + num + " n'existe pas."); return null; }
-	return ev;
-}
-
-
-
 
 
 
@@ -403,18 +466,22 @@ async function msgReply(msg, message){
 			console.log(err);
 		});
 }
-
-async function createEmbed() {
-	let owner = await bot.users.fetch('310450863845933057');
-	return new Discord.MessageEmbed().setColor(config.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21").setFooter(owner.username+"#"+owner.discriminator, owner.displayAvatarURL({ format: 'png', dynamic: true}));
+function createEmbed(msg) {
+	return new Discord.MessageEmbed().setColor(config.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21").setFooter(msg.author.username+"#"+msg.author.discriminator, msg.author.displayAvatarURL({ format: 'png', dynamic: true}));
 }
-
 function randomInt(min, max) {
 	return Math.floor((Math.random()*Math.floor(max))+Math.floor(min));
 }
-
 function randomGroupe() {
 	return groups.list[randomInt(0,groups.list.length-1)].toUpperCase();
+}
+function randomId() {
+	let result = "";
+	const chars = "abcdefghijklmnopqrstuvwxyz";
+	for (var i = 0; i < 5; i++) {
+		result += chars.charAt(Math.floor(Math.random()*chars.length));
+   }
+   return result;
 }
 
 Date.prototype.getWeek = function() {

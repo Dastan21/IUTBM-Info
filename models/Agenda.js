@@ -15,12 +15,14 @@ const AgendaSchema = new Schema({
 			type: Boolean,
 			default: true
 		},
-		_users: {
-			type: Array
-		},
-		_events: {
-			type: Array
-		}
+		_users: [{
+			type: mongoose.ObjectId,
+			ref: 'user'
+		}],
+		_events: [{
+			type: mongoose.ObjectId,
+			ref: 'event'
+		}]
     }
 );
 

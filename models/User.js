@@ -14,9 +14,10 @@ const UserSchema = new Schema({
 		group: {
 			type: String
 		},
-        _agendas: {
-			type: Array
-		}
+        _agendas: [{
+			type: mongoose.ObjectId,
+			ref: 'agenda'
+		}]
     }
 );
 
