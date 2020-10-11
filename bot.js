@@ -232,6 +232,7 @@ async function edtManager(msg, args) {
 			break;
 		case "set":
 			if (args.length == 1) { await showHelp(msg, ["edt"].concat(args)); return; }
+			group = args[1].toLowerCase();
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
 			if (user_doc != null && user_doc.group === group) { msgReply(msg, "tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
 			if (user_doc == null) 	user_doc = new User({id: msg.author.id, username: msg.author.username, group: group});
