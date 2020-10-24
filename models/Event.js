@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const EventSchema = new Schema({
-        id: {
-            type: Number,
-            required: true,
-            index: { unique: true }
-        },
         title: {
             type: String,
             required: true,
@@ -21,6 +16,9 @@ const EventSchema = new Schema({
 		state: {
 			type: String,
 			default: "todo"
+		},
+		_agenda: {
+			type: mongoose.Types.ObjectId
 		}
     }
 );
