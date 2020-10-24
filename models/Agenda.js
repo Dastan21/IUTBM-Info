@@ -2,18 +2,16 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const AgendaSchema = new Schema({
-        id: {
-            type: String,
-            required: true,
-            index: { unique: true }
-        },
-        name: {
+        title: {
             type: String,
             required: true,
         },
 		private: {
 			type: Boolean,
 			default: true
+		},
+		invite: {
+			type: String
 		},
 		_users: [{
 			type: mongoose.ObjectId,
