@@ -654,7 +654,7 @@ async function dmSend(msg, message, attachment) {
 		});
 }
 function createEmbed(msg) {
-	return new Discord.MessageEmbed().setColor(config.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21").setFooter(msg.author.tag, msg.author.displayAvatarURL({ format: 'png', dynamic: true}));
+	return new Discord.MessageEmbed().setColor(config.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21/IUTBM-Info").setFooter(msg.author.tag, msg.author.displayAvatarURL({ format: 'png', dynamic: true}));
 }
 function randomInt(min, max) {
 	return Math.round((Math.random()*Math.floor(max))+Math.floor(min));
