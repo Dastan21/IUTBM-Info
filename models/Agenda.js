@@ -8,7 +8,7 @@ const AgendaSchema = new Schema({
         },
 		private: {
 			type: Boolean,
-			default: true
+			default: false
 		},
 		invite: {
 			type: String

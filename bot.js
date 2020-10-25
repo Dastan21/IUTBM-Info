@@ -11,11 +11,9 @@ const groups = require('./configs/groups')
 var lastReq = null;
 
 
-/* Setup Discord Bot */
 bot.on('ready', () => { console.log(bot.user.tag + " is online"); })
 
 
-/* Setup Mongo Database */
 mongoose
     .connect(config.db_url, {
 			useNewUrlParser: true,
@@ -27,8 +25,8 @@ mongoose
     .catch(err => console.log(err));
 
 
-/* The main "loop" */
 bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(config.prefix)) commandProcess(msg); });
+
 
 async function commandProcess(msg) {
 	let rawCommand = msg.content;
@@ -53,14 +51,17 @@ async function commandProcess(msg) {
 	}
 }
 
+
 function showHelp(msg, cmds) {
 	let embed = createEmbed(msg);
 	if (cmds.length == 0) {
 		embed.setTitle("PANNEAU D'AIDE - HELP")
 			.setDescription("‎IUTBM-Info est un bot Discord qui permet de voir les EDT sur ADE et de gérer des agendas.\n‎")
 			.addFields(
-				{ name: "Utilisation", value: "`iut [command]`\n‎" },
-				{ name: "Arguments", value: "[command] : `edt` `agenda`\n‎" },
+				{ name: "Utilisation générale", value: "`iut [command]`\n‎" },
+				{ name: "Argument", value: "[command] : `edt` `agenda`\n‎" },
+				{ name: "Utilisation de la commande help", value: "`iut help [command1] [command2] [command3]...`\n‎" },
+				{ name: "Exemples", value: "`iut help edt`\n`iut help edt display`\n`iut help agenda modify title`\n`iut help agenda edit description`\n‎" },
 			)
 	} else {
 		cmds[0].toLowerCase();
@@ -82,7 +83,7 @@ function showHelp(msg, cmds) {
 							.setDescription("Attribuer un groupe à l'utilisateur.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut edt set [group]`\n‎" },
-								{ name: "Arguments", value: "[group] : **string** ∈ [S1-A1, S4-C2]\n‎" },
+								{ name: "Argument", value: "[group] : **string** ∈ [S1-A1, S4-C2]\n‎" },
 								{ name: "Exemple", value: "`iut edt set "+randomGroupe()+"`\n‎" }
 							);
 						break;
@@ -108,9 +109,9 @@ function showHelp(msg, cmds) {
 						embed.setTitle("PANNEAU D'AIDE - AGENDA > CREATE")
 							.setDescription("Créer un agenda.\n‎")
 							.addFields(
-								{ name: "Utilisation", value: "`iut agenda create \"[title]\"`\n‎" },
-								{ name: "Arguments", value: "[title] : **string** < 20\n‎" },
-								{ name: "Exemple", value: "`iut agenda create \"Agenda des "+randomGroupe().slice(0,-1)+"\"`\n‎" }
+								{ name: "Utilisation", value: "`iut agenda create \"[title]\" [private]`\n‎" },
+								{ name: "Arguments", value: "[title] : **string** < 20\n[private] : **boolean** *(default = false)*\n‎" },
+								{ name: "Exemples", value: "`iut agenda create \"Agenda des "+randomGroupe().slice(0,-1)+"\"`\n`iut agenda create \"Memo perso\" true`\n‎" }
 							);
 						break;
 					case "modify":
@@ -122,7 +123,7 @@ function showHelp(msg, cmds) {
 								.addFields(
 									{ name: "Utilisation", value: "`iut agenda modify [agendaID] title \"[title]\"`\n‎" },
 									{ name: "Arguments", value: "[agendaID] : **integer**\n‎[title] : **string**\n‎" },
-									{ name: "Exemple", value: "`iut agenda modify "+randomInt(1,15)+" title Agenda des "+randomGroupe().slice(0,-1)+"`\n‎" }
+									{ name: "Exemple", value: "`iut agenda modify "+randomInt(1,9)+" title \"Agenda des "+randomGroupe().slice(0,-1)+"\"`\n‎" }
 								);
 								break;
 							case "private":
@@ -131,7 +132,7 @@ function showHelp(msg, cmds) {
 								.addFields(
 									{ name: "Utilisation", value: "`iut agenda modify [agendaID] private [private]`\n‎" },
 									{ name: "Arguments", value: "[agendaID] : **integer**\n‎[private] : **boolean**\n‎" },
-									{ name: "Exemple", value: "`iut agenda modify "+randomInt(1,15)+" true`\n‎" }
+									{ name: "Exemple", value: "`iut agenda modify "+randomInt(1,9)+" private true`\n‎" }
 								);
 								break;
 							default:
@@ -148,8 +149,8 @@ function showHelp(msg, cmds) {
 							.setDescription("Supprimer un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda delete [agendaID]`\n‎" },
-								{ name: "Arguments", value: "[agendaID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda delete "+randomInt(1,15)+"`\n‎" }
+								{ name: "Argument", value: "[agendaID] : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda delete "+randomInt(1,9)+"`\n‎" }
 							);
 						break;
 					case "invite":
@@ -157,8 +158,8 @@ function showHelp(msg, cmds) {
 							.setDescription("Créer une invitation pour un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda invite [agendaID]`\n‎" },
-								{ name: "Arguments", value: "[agendaID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda invite "+randomInt(1,15)+"`\n‎" }
+								{ name: "Argument", value: "[agendaID] : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda invite "+randomInt(1,9)+"`\n‎" }
 							);
 						break;
 					case "join":
@@ -166,8 +167,8 @@ function showHelp(msg, cmds) {
 							.setDescription("Rejoindre un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda join [agendaID]`\n‎" },
-								{ name: "Arguments", value: "[agendaID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda join "+randomInt(1,15)+"`\n‎" }
+								{ name: "Argument", value: "[agendaID] : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda join "+randomInt(1,9)+"`\n‎" }
 							);
 						break;
 					case "leave":
@@ -175,17 +176,17 @@ function showHelp(msg, cmds) {
 							.setDescription("Quitter un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda leave [agendaID]`\n‎" },
-								{ name: "Arguments", value: "[agendaID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda leave "+randomInt(1,15)+"`\n‎" }
+								{ name: "Argument", value: "[agendaID] : **integer**\n‎" },
+								{ name: "Exemple", value: "`iut agenda leave "+randomInt(1,9)+"`\n‎" }
 							);
 						break;
 					case "show":
 						embed.setTitle("PANNEAU D'AIDE - AGENDA > EVENT > SHOW")
 							.setDescription("Afficher tous les événements d'un agenda.\n‎")
 							.addFields(
-								{ name: "Utilisations", value: "`iut agenda [agendaID] show`\n`iut agenda [agendaID] show [state]`\n‎" },
+								{ name: "Utilisation", value: "`iut agenda [agendaID] show [state]`\n‎" },
 								{ name: "Arguments", value: "[agendaID] : **integer**\n[state] : **string** ∈ [todo,done] *(default = null)*\n‎" },
-								{ name: "Exemples", value: "`iut agenda "+randomInt(1,15)+" show`‎\n`iut agenda "+randomInt(1,15)+" show todo`\n‎" }
+								{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" show`‎\n`iut agenda "+randomInt(1,9)+" show todo`\n‎" }
 							);
 						break;
 					case "add":
@@ -193,8 +194,8 @@ function showHelp(msg, cmds) {
 							.setDescription("Ajouter un événement dans un agenda.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda [agendaID] add \"[title]\" \"[description]\" [date]`\n‎" },
-								{ name: "Arguments", value: "[agendaID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" add \"TD Algo\" \"Finir exo "+randomInt(1,3)+" et relire cours\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"/202"+randomInt(0,1)+"`\n‎" }
+								{ name: "Arguments", value: "[agendaID] : **integer**\n[title] : **string** < 20\n[description] : **string** < 300\n[date] : **date** JJ/MM/YYYY\n‎" },
+								{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" add \"TD Algo\" \"Finir exo "+randomInt(1,3)+" et relire cours\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"/202"+randomInt(0,1)+"`\n`iut agenda "+randomInt(1,9)+" add \"DM Web à rendre\" \"\" "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"/202"+randomInt(0,1)+"`\n`iut agenda "+randomInt(1,9)+" add \"TP Expression\" \"Lire cours et faire résumé\" null`\n‎" }
 							);
 						break;
 					case "edit":
@@ -206,7 +207,7 @@ function showHelp(msg, cmds) {
 									.addFields(
 										{ name: "Utilisation", value: "`iut agenda [agendaID] edit [eventID] title \"[title]\"`\n‎" },
 										{ name: "Arguments", value: "[agendaID] : **integer**\n‎[eventID] : **integer**\n[title] : **string** < 20\n‎" },
-										{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" edit "+randomInt(1,15)+" title \"TP Expression\"`\n‎" }
+										{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" edit "+randomInt(1,15)+" title \"TP Expression\"`\n‎" }
 									);
 								break;
 							case "description":
@@ -215,7 +216,7 @@ function showHelp(msg, cmds) {
 									.addFields(
 										{ name: "Utilisation", value: "`iut agenda [agendaID] edit [eventID] description \"[description]\"`\n‎" },
 										{ name: "Arguments", value: "[agendaID] : **integer**\n‎[eventID] : **integer**\n[description] : **string** < 300\n‎" },
-										{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" edit "+randomInt(1,15)+" description \"Exo "+randomInt(1,3)+" à finir\"`\n‎" }
+										{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" edit "+randomInt(1,15)+" description \"Exo "+randomInt(1,3)+" à finir\"`\n`iut agenda "+randomInt(1,9)+" edit "+randomInt(1,15)+" description \"\"`\n‎" }
 									);
 								break;
 							case "date":
@@ -224,7 +225,7 @@ function showHelp(msg, cmds) {
 									.addFields(
 										{ name: "Utilisation", value: "`iut agenda [agendaID] edit [eventID] date [date]`\n‎" },
 										{ name: "Arguments", value: "[agendaID] : **integer**\n‎[eventID] : **integer**\n[date] : **date** JJ/MM/YYYY\n‎" },
-										{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" edit "+randomInt(1,15)+" date "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"/202"+randomInt(0,1)+"`\n‎" }
+										{ name: "Exemples", value: "`iut agenda "+randomInt(1,9)+" edit "+randomInt(1,15)+" date "+(("0"+randomInt(1,27)).slice(-2))+"/"+(("0"+randomInt(1,12)).slice(-2))+"/202"+randomInt(0,1)+"`\n`iut agenda "+randomInt(1,9)+" edit "+randomInt(1,15)+" date null`\n‎" }
 									);
 								break;
 							default:
@@ -242,25 +243,25 @@ function showHelp(msg, cmds) {
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda [agendaID] remove [eventID]`\n‎" },
 								{ name: "Arguments", value: "[agendaID] : **integer**\n[eventID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" remove "+randomInt(1,9)+"`" }
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" remove "+randomInt(1,9)+"`" }
 							);
 						break;
 					case "todo":
 						embed.setTitle("PANNEAU D'AIDE - AGENDA > EVENT > TODO")
-							.setDescription("Établir un événement comme 'à faire' d'un agenda.\n‎")
+							.setDescription("Établir un événement d'un agenda comme 'à faire'.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda [agendaID] todo [eventID]`\n‎" },
 								{ name: "Arguments", value: "[agendaID] : **integer**\n[eventID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" todo "+randomInt(1,9)+"`" }
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" todo "+randomInt(1,9)+"`" }
 							);
 						break;
 					case "done":
 						embed.setTitle("PANNEAU D'AIDE - AGENDA > EVENT > DONE")
-							.setDescription("Établir un événement comme 'terminé' d'un agenda.\n‎")
+							.setDescription("Établir un événement d'un agenda comme 'terminé'.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut agenda [agendaID] done [eventID]`\n‎" },
 								{ name: "Arguments", value: "[agendaID] : **integer**\n[eventID] : **integer**\n‎" },
-								{ name: "Exemple", value: "`iut agenda "+randomInt(1,15)+" done "+randomInt(1,9)+"`" }
+								{ name: "Exemple", value: "`iut agenda "+randomInt(1,9)+" done "+randomInt(1,9)+"`" }
 							);
 						break;
 					default:
@@ -279,6 +280,7 @@ function showHelp(msg, cmds) {
 	}
 	msgSend(msg, "", embed)
 }
+
 
 async function edtManager(msg, args) {
 	if (args.length == 0) { showHelp(msg, ["edt"]); return; }
@@ -370,6 +372,7 @@ async function getEDTFromADE(data) {
 	return screenshot;
 }
 
+
 async function agendaManager(msg, args) {
 	let i, j, data, inDM;
 	var user_doc, agenda_doc, event_doc, user_pop, agenda_pop;
@@ -428,9 +431,12 @@ async function agendaManager(msg, args) {
 			data = { title: args[1] };
 			i = 1; while (i < args.length && !args[i].endsWith('"')) { i++; data.title += " " + args[i]; }
 			if (i == args.length && args[args.length-1]) { msgReply(msg, "le titre est invalide."); return; }
-			if (args[args.length-1].endsWith('"')) { msgReply(msg, "la visibilité ne peut être vide."); return; }
-			if (!["true","false"].includes(args[args.length-1])) { msgReply(msg, "la visibilité est invalide."); return; }
-			data.private = args[args.length-1];
+			i += 1;
+			data.title.includes(args[i]) ? data.private = "false" : data.private = args[i];
+			if (!["true","false"].includes(data.private)) { msgReply(msg, "la visibilité est invalide."); return; }
+			try {
+				data.private = JSON.parse(data.private);
+			} catch (e) { msgReply(msg, "la visibilité est invalide."); return; }
 			data.title = data.title.replace(/"/gm, '');
 			if (data.title.length > 20) { msgReply(msg, "le titre est trop long."); return; }
 			agenda_doc = new Agenda(data);
@@ -520,7 +526,7 @@ async function agendaManager(msg, args) {
 				for (i = 0; i < agenda_pop._events.length; i++) {
 					event_doc = agenda_pop._events[i];
 					let state = event_doc.state === "todo" ? ' | :red_circle:' : ' | :green_circle:';
-					let date = " | "+("0"+event_doc.date.getDate()).slice(-2)+"/"+("0"+(event_doc.date.getMonth()+1)).slice(-2)+"/"+event_doc.date.getFullYear();
+					let date = event_doc.date != null ? " | "+("0"+event_doc.date.getDate()).slice(-2)+"/"+("0"+(event_doc.date.getMonth()+1)).slice(-2)+"/"+event_doc.date.getFullYear() : "";
 					if (event_doc.state == data.state || !["todo","done"].includes(args[2]))
 						embed.addField("[" + i + "] " + event_doc.title + date + state, event_doc.description + "\n‎");
 				}
@@ -546,10 +552,13 @@ async function agendaManager(msg, args) {
 			if (i == args.length && args[args.length-1]) { msgReply(msg, "la description est invalide."); return; }
 			if (data.description.length > 300) { msgReply(msg, "la description est trop longue."); return; }
 			data.description = data.description.replace(/"/gm, '');
-			if (args[args.length-1].endsWith('"')) { msgReply(msg, "la date doit être indiquée."); return; }
-			if (args[args.length-1].length != 10) { msgReply(msg, "la date est invalide."); return; }
-			data.date = new Date((args[args.length-1]).split('/').reverse().join('-'));
-			if (isNaN(data.date) || data.date.length) { msgReply(msg, "la date est invalide."); return; }
+			i += 1; data.date = args[i];
+			if (data.date.endsWith('"')) { msgReply(msg, "la date doit être indiquée."); return; }
+			if (data.date !== "null") {
+				if (args[args.length-1].length != 10) { msgReply(msg, "la date est invalide."); return; }
+				data.date = new Date((args[args.length-1]).split('/').reverse().join('-'));
+				if (isNaN(data.date) || data.date.length) { msgReply(msg, "la date est invalide."); return; }
+			} else data.date = null;
 			data.state = 'todo';
 			data._agenda = agenda_doc._id;
 			event_doc = new Event(data);
@@ -612,10 +621,6 @@ async function agendaManager(msg, args) {
 }
 
 
-
-
-
-
 function msgSend(msg, message){
 	msgSend(msg, message, null);
 }
@@ -676,11 +681,6 @@ Date.prototype.getWeek = function() {
 		return 1 + Math.ceil(dayDiff / 7);
 	return Math.ceil(dayDiff / 7);
 };
-
-
-
-
-
 
 
 bot.login(config.token);
