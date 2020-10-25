@@ -431,8 +431,7 @@ async function agendaManager(msg, args) {
 			data = { title: args[1] };
 			i = 1; while (i < args.length && !args[i].endsWith('"')) { i++; data.title += " " + args[i]; }
 			if (i == args.length && args[args.length-1]) { msgReply(msg, "le titre est invalide."); return; }
-			i += 1;
-			data.title.includes(args[i]) ? data.private = "false" : data.private = args[i];
+			i += 1; data.title.includes(args[i]) || args[i] == undefined ? data.private = "false" : data.private = args[i];
 			if (!["true","false"].includes(data.private)) { msgReply(msg, "la visibilité est invalide."); return; }
 			try {
 				data.private = JSON.parse(data.private);
