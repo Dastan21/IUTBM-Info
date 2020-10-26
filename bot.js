@@ -70,10 +70,10 @@ function showHelp(msg, cmds) {
 			case "edt":
 				switch (cmds[1]) {
 					case "display":
-						embed.setTitle("PANNEAU D'AIDE - EDT > SHOW")
+						embed.setTitle("PANNEAU D'AIDE - EDT > DISPLAY")
 							.setDescription("Afficher l'emploi du temps du groupe.\n‎")
 							.addFields(
-								{ name: "Utilisation", value: "`iut edt show [group] [week]`\n‎" },
+								{ name: "Utilisation", value: "`iut edt display [group] [week]`\n‎" },
 								{ name: "Arguments", value: "[group] : **string** ∈ [S1-A1, S4-C2]\n[week] : **integer** ∈ [0, 8] *(default = 0)*\n‎" },
 								{ name: "Exemples", value: "`iut edt display`\n`iut edt display "+randomInt(1,8)+"`\n`iut edt display "+randomGroupe()+"`\n`iut edt display "+randomGroupe()+" "+randomInt(1,8)+"`\n‎" }
 							);
@@ -379,7 +379,7 @@ async function agendaManager(msg, args) {
 	var embed = createEmbed(msg);
 	if (args.length == 0) { showHelp(msg, ["agenda"]); return; }
 	user_doc = await User.findOne({ id: msg.author.id });
-	if (user_doc == null) user_doc = new User({ id: msg.author.id, username: msg.author.username });
+	if (user_doc == null) { user_doc = new User({ id: msg.author.id, username: msg.author.username }); await user_doc.save(); }
 	args[0] = args[0].toLowerCase();
 	if (args.length == 1 && args[0] !== "list") { showHelp(msg, ["agenda"].concat(args)); return; }
 	if (args.length == 2 && args[0] === "modify") { showHelp(msg, ["agenda"].concat(args)); return; }
@@ -387,7 +387,7 @@ async function agendaManager(msg, args) {
 		if (isNaN(args[1])) { msgReply(msg, "le numéro d'agenda est invalide."); return; }
 		user_pop = await User.findOne(user_doc).populate('_agendas');
 		agenda_doc = user_pop._agendas[Number(args[1])];
-		if (agenda_doc == undefined) { msgReply(msg, "il n'y a pas d'agenda avec ce numéro."); return; }
+		if (agenda_doc == undefined) { msgReply(msg, "tu n'as pas d'agenda avec ce numéro."); return; }
 		if (args[0] !== "leave" && String(agenda_doc._users[0]) !== String(user_doc._id)) { msgReply(msg, "seul le créateur de cet agenda peut utiliser cette commande."); return; }
 	}
 	if (args.length == 2 && ["add","edit","remove","done","todo"].includes(args[1])) { showHelp(msg, ["agenda"].concat(args.slice(1))); return; }
@@ -396,12 +396,12 @@ async function agendaManager(msg, args) {
 		if (isNaN(args[0])) { msgReply(msg, "le numéro d'agenda est invalide."); return; }
 		user_pop = await User.findOne(user_doc).populate('_agendas');
 		agenda_doc = user_pop._agendas[Number(args[0])];
-		if (agenda_doc == undefined) { msgReply(msg, "il n'y a pas d'agenda avec ce numéro."); return; }
+		if (agenda_doc == undefined) { msgReply(msg, "tu n'as pas d'agenda avec ce numéro."); return; }
 		if (!["show","add"].includes(args[1])) {
 			if (isNaN(args[2])) { msgReply(msg, "le numéro d'événement est invalide."); return; }
 			agenda_pop = await Agenda.findOne(agenda_doc).populate('_events');
 			event_doc = agenda_pop._events[Number(args[2])];
-			if (event_doc == undefined) { msgReply(msg, "il n'y a pas d'événement avec ce numéro."); return; }
+			if (event_doc == undefined) { msgReply(msg, "tu n'as pas d'événement avec ce numéro."); return; }
 		}
 	}
 	switch (args[0]) {
@@ -492,25 +492,25 @@ async function agendaManager(msg, args) {
 			dmSend(msg, "L'invitation pour l'agenda `" + agenda_doc.title + "` est `" + agenda_doc.invite + "`.");
 			break;
 		case 'join':
-			agenda_doc = await Agenda.findOne({invite: args[1] });
-			if (agenda_doc == null) { msgReply(msg, "l'invitation est incorrecte ou a déjà été utilisée."); return; }
-			i = 0; while (i < user_doc._agendas.length && String(user_doc._agendas[i]._id) != String(agenda_doc._id)) { i++; }
+			agenda_pop = await Agenda.findOne({invite: args[1]}).populate('_agendas');
+			if (agenda_pop == null) { msgReply(msg, "l'invitation est incorrecte ou a déjà été utilisée."); return; }
+			i = 0; while (i < user_doc._agendas.length && String(user_doc._agendas[i]._id) != String(agenda_pop._id)) { i++; }
 			if (i != user_doc._agendas.length) { msgReply(msg, "tu as déjà rejoint cet agenda."); return; }
-			agenda_doc._users.push(user_doc._id);
-			await agenda_doc.save();
-			user_doc._agendas.push(agenda_doc._id);
+			agenda_pop._users.push(user_doc._id);
+			await agenda_pop.save();
+			user_doc._agendas.push(agenda_pop._id);
 			await user_doc.save();
-			msgReply(msg, "tu viens de rejoindre l'agenda `" + agenda_doc.title + "`.");
+			msgReply(msg, "tu viens de rejoindre l'agenda `" + agenda_pop.title + "`.");
 			break;
 		case 'leave':
 			i = 0; while (i < user_doc._agendas.length && user_doc._agendas[i]._id === agenda_doc._id) { i++; }
-			if (i == user_doc._agendas.length) { msgReply(msg, "tu n'a pas agenda avec cet identifiant."); return; }
+			if (i == user_doc._agendas.length) { msgReply(msg, "tu n'as pas d'agenda avec cet identifiant."); return; }
+			if (String(user_doc._id) == String(agenda_doc._users[0]._id)) { msgReply(msg, "tu ne peux pas quitter ton propre agenda."); return; }
 			agenda_doc._users.splice(agenda_doc._users.indexOf(user_doc._id), 1);
 			agenda_doc.invite = null;
 			await agenda_doc.save();
 			user_doc._agendas.splice(user_doc._agendas.indexOf(agenda_doc._id), 1);
 			await user_doc.save();
-			if (user_doc._agendas.length == 0) { msgReply(msg, "tu ne peux pas quitter un agenda si tu es seul dedans."); return; }
 			msgReply(msg, "tu as quitté l'agenda `" + agenda_doc.title + "`.");
 			break;
 	}
@@ -568,7 +568,8 @@ async function agendaManager(msg, args) {
 			break;
 		case 'edit':
 			args = args.slice(3);
-				if (args.length == 1) { showHelp(msg, ["agenda"].concat(args)); return; }
+			if (args.length == 1) { showHelp(msg, ["agenda"].concat(args)); return; }
+			let prev_title = event_doc.title;
 			switch (args[0]) {
 				case "title":
 					if (args[1] === '""') { msgReply(msg, "le titre ne peut être vide."); return; }
@@ -592,9 +593,12 @@ async function agendaManager(msg, args) {
 					await event_doc.save();
 					break;
 				case "date":
-					if (args[args.length-1].length != 10) { msgReply(msg, "la date est invalide."); return; }
-					data = { date: new Date((args[args.length-1]).split('/').reverse().join('-')) };
-					if (isNaN(data.date) || data.date.length) { msgReply(msg, "la date est invalide."); return; }
+					data = { date: null };
+					if (args[1] !== "null") {
+						if (args[1].length != 10) { msgReply(msg, "la date est invalide."); return; }
+						data.date = new Date((args[args.length-1]).split('/').reverse().join('-'));
+						if (isNaN(data.date) || data.date.length) { msgReply(msg, "la date est invalide."); return; }
+					}
 					event_doc.date = data.date;
 					await event_doc.save();
 					break;
@@ -602,7 +606,7 @@ async function agendaManager(msg, args) {
 					showHelp(msg, ["agenda","edit"]);
 					return;
 			}
-			msgReply(msg, "l'événement `" + event_doc.title + "` a bien été édité.");
+			msgReply(msg, "l'événement `" + prev_title + "` a bien été édité.");
 			break;
 		case 'remove':
 			await Event.deleteOne(event_doc);
