@@ -62,7 +62,7 @@ function showHelp(msg, cmds) {
 				{ name: "Argument", value: "[command] : `edt` `agenda`\n‎" },
 				{ name: "Utilisation de la commande help", value: "`iut help [command1] [command2] [command3]...`\n‎" },
 				{ name: "Exemples", value: "`iut help edt`\n`iut help edt display`\n`iut help agenda modify title`\n`iut help agenda edit description`\n‎" },
-			)
+			);
 	} else {
 		cmds[0].toLowerCase();
 		if (cmds.length > 1) cmds[1].toLowerCase();
@@ -87,12 +87,19 @@ function showHelp(msg, cmds) {
 								{ name: "Exemple", value: "`iut edt set "+randomGroupe()+"`\n‎" }
 							);
 						break;
+					case "get":
+						embed.setTitle("PANNEAU D'AIDE - EDT > GET")
+							.setDescription("Connaître à quel groupe l'utilisateur appartient.\n‎")
+							.addFields(
+								{ name: "Utilisation", value: "`iut edt get`\n‎" }
+							);
+						break;
 					default:
 						embed.setTitle("PANNEAU D'AIDE - EDT")
 							.setDescription("Afficher l'emploi du temps d'un groupe et définir un groupe pour l'utilisateur.\n‎")
 							.addFields(
 								{ name: "Utilisation", value: "`iut edt [actionEDT]`\n‎" },
-								{ name: "Arguments", value: "[actionEDT] : `display` `set`\n‎" }
+								{ name: "Arguments", value: "[actionEDT] : `display` `set` `get`\n‎" }
 							);
 				}
 				break;
@@ -285,11 +292,13 @@ function showHelp(msg, cmds) {
 async function edtManager(msg, args) {
 	if (args.length == 0) { showHelp(msg, ["edt"]); return; }
 	var user_doc = await User.findOne({ id: msg.author.id });
+	if (user_doc == null) { user_doc = new User({ id: msg.author.id, username: msg.author.username }); await user_doc.save(); }
 	var group;
+	for (i = 0; i < args.length; i++) args[i] = args[i].toLowerCase();
 	switch (args[0].toLowerCase()) {
 		case "display":
 			group = args[1];
-			if (group == undefined && user_doc != null && user_doc.group != undefined) group = user_doc.group;
+			if (group == undefined || !isNaN(group)) group = user_doc.group;
 			if (group == undefined) { msgReply(msg, "tu n'es assigné à aucun groupe."); return; }
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
@@ -303,13 +312,18 @@ async function edtManager(msg, args) {
 			break;
 		case "set":
 			if (args.length == 1) { showHelp(msg, ["edt"].concat(args)); return; }
-			group = args[1].toLowerCase();
+			group = args[1];
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
-			if (user_doc != null && user_doc.group === group) { msgReply(msg, "tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
-			if (user_doc == null) 	user_doc = new User({id: msg.author.id, username: msg.author.username, group: group});
-			else 					await User.updateOne(user_doc, {group: group});
-			msgReply(msg, "tu es désormais dans le groupe `" + group.toUpperCase() + "`.");
+			if (user_doc.group === group) { msgReply(msg, "tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
+			await User.updateOne(user_doc, {group: group});
 			await user_doc.save();
+			msgReply(msg, "tu es désormais dans le groupe `" + group.toUpperCase() + "`.");
+			break;
+		case "get":
+			if (user_doc.group == undefined)
+				msgReply(msg, "tu n'es assigné à encore aucun groupe.");
+			else
+				msgReply(msg, "tu es dans le groupe `" + user_doc.group.toUpperCase() + "`.");
 			break;
 		default:
 			msgReply(msg, "cette commande n'existe pas.");
