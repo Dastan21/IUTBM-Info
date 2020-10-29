@@ -13,7 +13,6 @@ var lastReq = null;
 
 bot.on('ready', () => { console.log(bot.user.tag + " is online"); })
 
-
 mongoose
     .connect(config.db_url, {
 			useNewUrlParser: true,
@@ -25,7 +24,7 @@ mongoose
     .catch(err => console.log(err));
 
 
-bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(config.prefix)) commandProcess(msg); });
+bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(config.prefix) && (msg.channel.id !== "771324655461728266" || (msg.channel.id === "771324655461728266" && msg.channel.id === "771324655461728266"))) commandProcess(msg); });
 
 
 async function commandProcess(msg) {
@@ -298,7 +297,13 @@ async function edtManager(msg, args) {
 	switch (args[0].toLowerCase()) {
 		case "display":
 			group = args[1];
-			if (group == undefined || !isNaN(group)) group = user_doc.group;
+			if (group == undefined || !isNaN(group)) {
+				group = user_doc.group;
+				for (i = 0; i < msg.member._roles.length; i++) {
+					let role = msg.guild.roles.cache.get(msg.member._roles[i]).name.toLowerCase();
+					if (groups.list.includes(role)) { group = role; break; }
+				}
+			}
 			if (group == undefined) { msgReply(msg, "tu n'es assigné à aucun groupe."); return; }
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
@@ -701,3 +706,7 @@ Date.prototype.getWeek = function() {
 
 
 bot.login(config.token);
+
+// https://sedna.univ-fcomte.fr/jsp/imageEt?identifier=610153e128fff7b03e9b1eddd0e8378bw59642&projectId=9&idPianoWeek=13&idPianoDay=0%2C1%2C2%2C3%2C4%2C5&idTree=4708&width=640&height=480&lunchName=REPAS&displayMode=8&showLoad=false&ttl=1603725623296&displayConfId=35
+
+// https://sedna.univ-fcomte.fr/jsp/imageEt?identifier=db48229c04bd6e1c65f2cc70426db319w60225&projectId=9&idPianoWeek=14&idPianoDay=0%2C1%2C2%2C3%2C4%2C5&idTree=4708&width=640&height=480&lunchName=REPAS&displayMode=8&showLoad=false&ttl=1603725950976&displayConfId=35
