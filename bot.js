@@ -1,17 +1,15 @@
-const config = require('./configs/config')
-const Discord = require('discord.js')
-const bot = new Discord.Client()
-const mongoose = require('mongoose')
-const { Builder, By, Key, until } = require('selenium-webdriver');
-const { Options } = require('selenium-webdriver/chrome');
+const config = require('./configs/config');
+const Discord = require('discord.js');
+const bot = new Discord.Client();
+const mongoose = require('mongoose');
 const request = require('request');
 const phin = require('phin');
-const { Image, createCanvas, loadImage } = require('canvas')
-const Agenda = require('./models/Agenda')
-const Event = require('./models/Event')
-const User = require('./models/User')
-const groups = require('./configs/groups')
-const groupids = require('./configs/groupids')
+const { Image, createCanvas, loadImage } = require('canvas');
+const Agenda = require('./models/Agenda');
+const Event = require('./models/Event');
+const User = require('./models/User');
+const groups = require('./configs/groups');
+const groupids = require('./configs/groupids');
 var lastReq = null;
 
 
@@ -311,7 +309,7 @@ async function edtManager(msg, args) {
 			if (group == undefined) { msgReply(msg, "tu n'es assigné à aucun groupe."); return; }
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
-			if (weeks_ahead != 0 && (isNaN(weeks_ahead) || Number(weeks_ahead) < 0 || Number(weeks_ahead) > 8)) { msgReply(msg, "la semaine doit être un nombre compris entre 0 et 8."); return; }
+			if (weeks_ahead != 0 && (isNaN(weeks_ahead) || Number(weeks_ahead) < 0 || Number(weeks_ahead) > 20)) { msgReply(msg, "la semaine doit être un nombre compris entre 0 et 20."); return; }
 			request('https://sedna.univ-fcomte.fr/jsp/custom/ufc/mplanif.jsp?id=' + groupids[group] + "&jours=" + (7*(Number(weeks_ahead)+1)), function (err, res, body) {
 				if (err) console.error(res && res.statusCode + ": " + err);
 				let start = body.indexOf('https://');
@@ -669,7 +667,3 @@ Date.prototype.getWeek = function() {
 
 
 bot.login(config.token);
-
-// https://sedna.univ-fcomte.fr/jsp/imageEt?identifier=610153e128fff7b03e9b1eddd0e8378bw59642&projectId=9&idPianoWeek=13&idPianoDay=0%2C1%2C2%2C3%2C4%2C5&idTree=4708&width=640&height=480&lunchName=REPAS&displayMode=8&showLoad=false&ttl=1603725623296&displayConfId=35
-
-// https://sedna.univ-fcomte.fr/jsp/imageEt?identifier=db48229c04bd6e1c65f2cc70426db319w60225&projectId=9&idPianoWeek=14&idPianoDay=0%2C1%2C2%2C3%2C4%2C5&idTree=4708&width=640&height=480&lunchName=REPAS&displayMode=8&showLoad=false&ttl=1603725950976&displayConfId=35
