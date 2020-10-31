@@ -4,10 +4,14 @@ const bot = new Discord.Client()
 const mongoose = require('mongoose')
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const { Options } = require('selenium-webdriver/chrome');
+const request = require('request');
+const phin = require('phin');
+const { Image, createCanvas, loadImage } = require('canvas')
 const Agenda = require('./models/Agenda')
 const Event = require('./models/Event')
 const User = require('./models/User')
 const groups = require('./configs/groups')
+const groupids = require('./configs/groupids')
 var lastReq = null;
 
 
@@ -24,7 +28,7 @@ mongoose
     .catch(err => console.log(err));
 
 
-bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(config.prefix) && (msg.channel.id !== "771324655461728266" || (msg.channel.id === "771324655461728266" && msg.channel.id === "771324655461728266"))) commandProcess(msg); });
+bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(config.prefix)) commandProcess(msg); });
 
 
 async function commandProcess(msg) {
@@ -308,12 +312,27 @@ async function edtManager(msg, args) {
 			if (!groups.list.includes(group)) { msgReply(msg, "ce groupe n'existe pas."); return; }
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
 			if (weeks_ahead != 0 && (isNaN(weeks_ahead) || Number(weeks_ahead) < 0 || Number(weeks_ahead) > 8)) { msgReply(msg, "la semaine doit être un nombre compris entre 0 et 8."); return; }
-			if (lastReq != null) { msg.react('❌'); return; }
-			else msg.react('✅');
-			lastReq = "iut edt " + args.join(' ');
-			var waiting_msg = await msg.channel.send("En train de faire une capture d'écran pour le groupe `" + group.toUpperCase() + "`...");
-			await msgSend(msg, "Groupe : **" + group.toUpperCase() + "**", new Discord.MessageAttachment(await getEDTFromADE(getEDTData(group, weeks_ahead)), "edt.png"));
-			await waiting_msg.delete();
+			request('https://sedna.univ-fcomte.fr/jsp/custom/ufc/mplanif.jsp?id=' + groupids[group] + "&jours=" + (7*(Number(weeks_ahead)+1)), function (err, res, body) {
+				if (err) console.error(res && res.statusCode + ": " + err);
+				let start = body.indexOf('https://');
+				let end = body.indexOf('">Affichage pla');
+				let req = body.slice(start, end);
+				req = req.replace("height=480", "height=960");
+				phin({ 'url': req }).then(res => {
+					const img = new Image();
+					img.src = res.body;
+					const canvas = createCanvas(540, 810);
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(img, 0, 0);
+					ctx.strokeStyle = '#000000';
+					ctx.lineWidth = 2;
+					ctx.beginPath();
+					ctx.moveTo(0, 810);
+					ctx.lineTo(540, 810);
+					ctx.stroke();
+					msgSend(msg, "**Groupe " + group.toUpperCase() + "**", new Discord.MessageAttachment(canvas.toBuffer('image/png')));
+				});
+			});
 			break;
 		case "set":
 			if (args.length == 1) { showHelp(msg, ["edt"].concat(args)); return; }
@@ -333,62 +352,6 @@ async function edtManager(msg, args) {
 		default:
 			msgReply(msg, "cette commande n'existe pas.");
 	}
-}
-function getEDTData(group, weeks_ahead) {
-	let data = {};
-	/* Group */
-	data.annee = group[1] < 3 ? "1e" : "2e";
-	data.semestre = "s" + group[1];
-	data.classe = group[3];
-	data.groupe = data.classe + group[4];
-	/* Week */
-	data.semaine = ((new Date()).getWeek() + Number(weeks_ahead)) % 54;
-	return data;
-}
-async function getEDTFromADE(data) {
-	var screenshot = null;
-	let driver = await new Builder()
-		.forBrowser('chrome')
-		.setChromeOptions(new Options().headless().windowSize({ width: 1920, height: 1080 }))
-		// .setChromeOptions(new Options().windowSize({ width: 1920, height: 1080 })) // DEBUG
-		.build();
-	try {
-		await driver.get('https://sedna.univ-fcomte.fr/direct/myplanning.jsp').catch(err => { console.error("couldn't connect to ADE : " + err); });
-		// await console.log("Chrome webdriver connected");
-		await driver.findElement(By.id('username')).sendKeys(config.cas_auth.id);
-		await driver.findElement(By.id('password')).sendKeys(config.cas_auth.password);
-		await driver.findElement(By.name('submit')).click();
-		await driver.sleep(3000);
-		let el = await driver.wait(until.elementLocated(By.xpath(groups[data.annee].xpath)), 10000).catch(err => { console.log(err); });
-		await el.click();
-		await driver.sleep(500);
-		await driver.actions().doubleClick(el).perform();
-		el = await driver.wait(until.elementLocated(By.xpath(groups[data.annee][data.semestre].xpath)), 5000).catch(err => { console.log(err); });
-		await el.click();
-		await driver.sleep(500);
-		await driver.actions().doubleClick(el).perform();
-		el = await driver.wait(until.elementLocated(By.xpath(groups[data.annee][data.semestre][data.classe].xpath)), 5000).catch(err => { console.log(err); });
-		await el.click();
-		await driver.sleep(500);
-		await driver.actions().doubleClick(el).perform();
-		await driver.wait(until.elementLocated(By.xpath(groups[data.annee][data.semestre][data.classe][data.groupe].xpath)), 5000).click().catch(err => { console.log(err); });
-		await driver.sleep(500);
-		await driver.wait(until.elementLocated(By.xpath("//button[starts-with(., '" + data.semaine + " ')]")), 5000).click().catch(err => { console.log(err); });
-		el = await driver.wait(until.elementLocated(By.xpath(groups[data.annee][data.semestre][data.classe].xpath)), 5000).catch(err => { console.log(err); });
-		await driver.sleep(500);
-		await driver.actions().keyDown(Key.CONTROL).click(await driver.findElement(By.xpath("//button[text()='Sam']"))).perform();
-		await driver.sleep(500);
-		await driver.actions().keyDown(Key.CONTROL).click(await driver.findElement(By.xpath("//button[text()='Dim']"))).perform();
-		await driver.sleep(2000);
-		await driver.findElement(By.id('x-auto-19')).takeScreenshot()
-			.then(str => { screenshot = Buffer.from(str, "base64"); })
-			.catch(err => { console.error("couldn't take screenshot: " + err); });
-	} finally {
-		await driver.quit();
-		lastReq = null;
-		// await console.log("Chrome webdriver disconnected");
-	}
-	return screenshot;
 }
 
 
