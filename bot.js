@@ -356,8 +356,8 @@ bot.on('messageReactionAdd', (messageReaction, user) => {
 	if (!user.bot && lastEDT[messageReaction.message.channel.guild.id].msgId.includes(String(messageReaction.message.id)) && Object.values(arrows).includes(messageReaction._emoji.name)) {
 		let msgReact = messageReaction.message;
 		switch (messageReaction._emoji.name) {
-			case arrows.up: lastEDT[msgReact.channel.guild.id].groupId++; break;
-			case arrows.down: lastEDT[msgReact.channel.guild.id].groupId--; break;
+			case arrows.up: lastEDT[msgReact.channel.guild.id].groupId--; break;
+			case arrows.down: lastEDT[msgReact.channel.guild.id].groupId++; break;
 			case arrows.left: if (lastEDT[msgReact.channel.guild.id].weekId == 0) { return; } lastEDT[msgReact.channel.guild.id].weekId--; break;
 			case arrows.right: if (lastEDT[msgReact.channel.guild.id].weekId == 20) { return; } lastEDT[msgReact.channel.guild.id].weekId++; break;
 			default: ;
