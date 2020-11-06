@@ -1,0 +1,43 @@
+span(class="title-bar" data-responsive-toggle="navbar" data-hide-for="medium")
+	button(class="menu-icon" type="button" data-toggle)
+	div(class="title-bar-title") Menu
+
+// Navbar
+nav#navbar(class="top-bar topbar-responsive")
+	div(class="top-bar-title")
+		a.logo(href="/" class="topbar-responsive-logo")
+			img(src="img/icon.png" class="icon" alt="IUTBM-Info Logo")
+		if cookies && cookies.token
+			a(href="/edt" class="button secondary" style="margin-left: 1em") EDT
+			a(href="/agenda" class="button secondary") Agenda
+	div(class="top-bar-right")
+		ul(class="menu")
+			li(class="has-submenu")
+				if cookies && cookies.token
+					- var ext = cookies.avatar.startsWith("a_") ? 'gif' : 'png';
+					- var link = "https://cdn.discordapp.com/avatars/"+cookies.id+"/"+cookies.avatar+"."+ext;
+					img(src=""+link class="icon" alt="Avatar Image" data-toggle="profilepicture")
+					ul#profilepicture(class="dropdown-pane bottom float-right" data-dropdown)
+						li
+							a(href="/profile" class="dropdown-item button") Profile
+						li
+							a(class="dropdown-item button alert" data-open="confirmLogoutModal") Logout
+				else
+					a(class="button" href="/discord/login" style="margin-right: 1em") Login
+
+
+
+// Modal
+div#confirmLogoutModal(class="reveal" data-reveal)
+	h1 Logout
+	p(class="lead") Are you sure you want to log out ?
+	div(class="modal-footer flex-center")
+	a(href="/discord/logout" class="button alert") Yes
+	a(type="button" class="button secondary" data-close) No
+	button(class="close-button" data-close aria-label="Close modal" type="button")
+		span(aria-hidden="true") &times;
+
+
+
+// Script
+script $(document).ready(function() { $(document).foundation(); })

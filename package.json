@@ -1,15 +1,27 @@
 {
-  "name": "edt-info",
-  "version": "1.0.0",
-  "description": "Discord bot to show calendar",
-  "main": "bot.js",
+  "name": "iutbm-info",
+  "version": "0.0.0",
+  "private": true,
   "author": "Loïc Degrange",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
   "dependencies": {
     "canvas": "^2.6.1",
-    "discord.js": "^12.3.1",
-    "mongoose": "^5.10.8",
+    "clean-css": "^4.2.3",
+    "cookie-parser": "^1.4.5",
+    "debug": "~2.6.9",
+    "discord.js": "^12.4.1",
+    "express": "~4.16.1",
+    "http-errors": "^1.8.0",
+    "mongoose": "^5.10.11",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
+    "npm": "^7.0.7",
+    "path": "^0.12.7",
     "phin": "^3.5.0",
+    "pug": "^3.0.0",
     "request": "^2.88.2",
-    "selenium-webdriver": "^4.0.0-alpha.7"
+    "uglify-js": "^3.11.4"
   }
 }

@@ -1,0 +1,79 @@
+@font-face {
+	font-family: SignikaNegative;
+	src: url("../font/SignikaNegative.ttf");
+}
+
+body {
+	background-color: #2F3136;
+	font-family: SignikaNegative, sans-serif !important;
+	color: #DCDCDC;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+*:focus {
+    outline: none;
+}
+
+#navbar, .title-bar {
+	background-color: #18191C;
+	-moz-box-shadow:    0 3px 16px -6px #000;
+	-webkit-box-shadow: 0 3px 16px -6px #000;
+	box-shadow:         0 3px 16px -6px #000;
+}
+
+.button {
+	margin: 0;
+}
+
+.icon {
+	height: 64px;
+	border-radius: 10em;
+}
+
+.top-bar, .top-bar ul {
+	background-color: inherit;
+}
+
+.dropdown-pane {
+	z-index: 20;
+	border: none;
+	padding: 0;
+	list-style: none;
+	width: auto;
+}
+
+html.is-reveal-open {
+	overflow-y: unset;
+}
+
+.reveal-overlay {
+	background-color: rgba(0, 0, 0, 0);
+}
+
+#confirmLogoutModal {
+	top: 10em !important;
+	margin: 2em auto;
+	background-color: #18191C;
+	border: none;
+}
+
+#confirmLogoutModal h1 {
+	color: #cc4b37;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+#confirmLogoutModal .close-button {
+	color: #cc4b37;
+}
+
+#confirmLogoutModal .close-button:focus, #confirmLogoutModal .close-button:hover {
+	color: #DCDCDC;
+}
+
+.error {
+	margin: 3em;
+}
