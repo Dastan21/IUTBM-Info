@@ -540,6 +540,7 @@ async function agendaManager(args) {
 			break;
 		case 'add':
 			args = args.slice(1);
+			msgReply("le titre ne peut être vide.");
 			if (args[1] === '""') { msgReply("le titre ne peut être vide."); return; }
 			if (!args[1].startsWith('"')) { msgReply("le titre est invalide."); return; }
 			data = { title: args[1] };
@@ -644,7 +645,7 @@ async function msgReply(content){
 	if (message.channel.type === "dm")
 		return dmSend(content, null);
 	else {
-		return await msg
+		return await message
 			.reply(content)
 			.catch(err => {
 				console.log(err);
