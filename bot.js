@@ -346,7 +346,7 @@ function getEDT(group, weeks_ahead) {
 			if (err) reject(error);
 			let start = body.indexOf('https://');
 			let end = body.indexOf('">Affichage pla');
-			let url = body.slice(start, end).replace("height=480", "height=960");
+			let url = body.slice(start, end).replace("height=480", "height=960").replace("displayConfId=35", "displayConfId=45").replace("idPianoDay=0%2C1%2C2%2C3%2C4%2C5", "&idPianoDay=0%2C1%2C2%2C3%2C4");
 			let week_str = weeks_ahead > 0 ? ` - Semaine +${weeks_ahead}` : "";
 			resolve(createEmbed().setTitle(`**Groupe ${group.toUpperCase()}${week_str}**`).setThumbnail(null).setImage(url));
 		});
