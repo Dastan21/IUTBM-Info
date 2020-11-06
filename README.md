@@ -10,4 +10,4 @@
 - **agenda** : gérer des agendas
 
 ## Lien d'invitation
-https://discord.com/oauth2/authorize?client_id=760210563677552673&scope=bot&permissions=34816
+https://discord.com/oauth2/authorize?client_id=760210563677552673&scope=bot&permissions=43072
