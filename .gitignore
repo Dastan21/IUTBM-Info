@@ -1,5 +1,5 @@
 node_modules/
-configs/
+config/
 chromedriver.exe
 debug.log
 run.sh
