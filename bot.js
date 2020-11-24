@@ -1,4 +1,4 @@
-const config = require('./configs/config');
+const secrets = require('./config/secrets');
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 const mongoose = require('mongoose');
@@ -8,8 +8,8 @@ const { Image, createCanvas, loadImage } = require('canvas');
 const Agenda = require('./models/Agenda');
 const Event = require('./models/Event');
 const User = require('./models/User');
-const groups = require('./configs/groups');
-const groupids = require('./configs/groupids');
+const groups = require('./config/groups');
+const groupids = require('./config/groupids');
 const arrows = { up: '🔼', down: '🔽', left: '⬅️', right: '➡️', refresh: '🔄' };
 var lastEDT = {};
 var message = null;
@@ -17,7 +17,7 @@ var message = null;
 bot.on('ready', () => { console.log(bot.user.tag + " is online"); })
 
 mongoose
-    .connect(config.db_url, {
+    .connect(secrets.db_url, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			useFindAndModify: false,
@@ -27,12 +27,12 @@ mongoose
     .catch(err => console.log(err));
 
 
-bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(config.prefix)) { message = msg; commandProcess(); } });
+bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(secrets.prefix)) { message = msg; commandProcess(); } });
 
 
 async function commandProcess() {
 	let rawCommand = message.content;
-    let fullCommand = rawCommand.substr(config.prefix.length+1);
+    let fullCommand = rawCommand.substr(secrets.prefix.length+1);
     let splitCommand = fullCommand.split(' ');
 	splitCommand = splitCommand.filter(function(e){return e});
     let primaryCommand = splitCommand[0];
@@ -660,7 +660,7 @@ async function dmSend(content, attachment) {
 		});
 }
 function createEmbed() {
-	return new Discord.MessageEmbed().setColor(config.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21/IUTBM-Info").setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png', dynamic: true}));
+	return new Discord.MessageEmbed().setColor(secrets.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21/IUTBM-Info").setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png', dynamic: true}));
 }
 function randomInt(min, max) {
 	return Math.round((Math.random()*Math.floor(max))+Math.floor(min));
@@ -689,4 +689,4 @@ Date.prototype.getWeek = function() {
 };
 
 
-bot.login(config.token);
+bot.login(secrets.token);
