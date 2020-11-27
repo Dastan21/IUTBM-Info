@@ -373,9 +373,11 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 			group = user_doc.group;
 			lastEDT[msgReact.channel.guild.id].weekId = 0;
 		}
-		getEDT(group, lastEDT[msgReact.channel.guild.id].weekId).then(embed => {
+		if (group !== undefined) {
+			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId).then(embed => {
 			msgReact.edit("", embed);
-		});
+			});
+		}
 	}
 });
 
