@@ -352,7 +352,7 @@ function getEDT(group, weeks_ahead) {
 		});
 	});
 }
-bot.on('messageReactionAdd', (messageReaction, user) => {
+bot.on('messageReactionAdd', async (messageReaction, user) => {
 	if (!user.bot && lastEDT[messageReaction.message.channel.guild.id].msgId.includes(String(messageReaction.message.id)) && Object.values(arrows).includes(messageReaction._emoji.name)) {
 		let msgReact = messageReaction.message;
 		switch (messageReaction._emoji.name) {
@@ -368,6 +368,11 @@ bot.on('messageReactionAdd', (messageReaction, user) => {
 		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groups.list.length) % groups.list.length;
 		lastEDT[msgReact.channel.guild.id].weekId %= 21;
 		let group = groups.list[lastEDT[msgReact.channel.guild.id].groupId];
+		if (messageReaction._emoji.name == arrows.refresh) {
+			let user_doc = await User.findOne({ id: user.id });
+			group = user_doc.group;
+			lastEDT[msgReact.channel.guild.id].weekId = 0;
+		}
 		getEDT(group, lastEDT[msgReact.channel.guild.id].weekId).then(embed => {
 			msgReact.edit("", embed);
 		});
