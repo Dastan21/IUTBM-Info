@@ -355,12 +355,17 @@ function getEDT(group, weeks_ahead) {
 bot.on('messageReactionAdd', async (messageReaction, user) => {
 	if (!user.bot && lastEDT[messageReaction.message.channel.guild.id].msgId.includes(String(messageReaction.message.id)) && Object.values(arrows).includes(messageReaction._emoji.name)) {
 		let msgReact = messageReaction.message;
+		let group_index = -1;
 		switch (messageReaction._emoji.name) {
 			case arrows.up: lastEDT[msgReact.channel.guild.id].groupId--; break;
 			case arrows.down: lastEDT[msgReact.channel.guild.id].groupId++; break;
 			case arrows.left: if (lastEDT[msgReact.channel.guild.id].weekId == 0) { return; } lastEDT[msgReact.channel.guild.id].weekId--; break;
 			case arrows.right: if (lastEDT[msgReact.channel.guild.id].weekId == 20) { return; } lastEDT[msgReact.channel.guild.id].weekId++; break;
-			default: ;
+			case arrows.refresh:
+				group_index = Object.keys(groupids).indexOf(user_doc.group);
+				let user_doc = await User.findOne({ id: user.id });
+				if (group_index != -1) lastEDT[msgReact.channel.guild.id].groupId = group_index;
+				lastEDT[msgReact.channel.guild.id].weekId = 0;
 		}
 		const userReactions = msgReact.reactions.cache.filter(reaction => reaction.users.cache.has(user.id));
 		try { for (const reaction of userReactions.values()) { reaction.users.remove(user.id); }
@@ -368,12 +373,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groups.list.length) % groups.list.length;
 		lastEDT[msgReact.channel.guild.id].weekId %= 21;
 		let group = groups.list[lastEDT[msgReact.channel.guild.id].groupId];
-		if (messageReaction._emoji.name == arrows.refresh) {
-			let user_doc = await User.findOne({ id: user.id });
-			group = user_doc.group;
-			lastEDT[msgReact.channel.guild.id].weekId = 0;
-		}
-		if (group !== undefined) {
+		if (group_index != -1) {
 			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId).then(embed => {
 			msgReact.edit("", embed);
 			});
