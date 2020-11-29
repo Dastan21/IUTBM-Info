@@ -362,8 +362,8 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 			case arrows.left: if (lastEDT[msgReact.channel.guild.id].weekId == 0) { return; } lastEDT[msgReact.channel.guild.id].weekId--; break;
 			case arrows.right: if (lastEDT[msgReact.channel.guild.id].weekId == 20) { return; } lastEDT[msgReact.channel.guild.id].weekId++; break;
 			case arrows.refresh:
-				group_index = Object.keys(groupids).indexOf(user_doc.group);
 				let user_doc = await User.findOne({ id: user.id });
+				group_index = Object.keys(groupids).indexOf(user_doc.group);
 				if (group_index != -1) lastEDT[msgReact.channel.guild.id].groupId = group_index;
 				lastEDT[msgReact.channel.guild.id].weekId = 0;
 		}
@@ -373,7 +373,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groups.list.length) % groups.list.length;
 		lastEDT[msgReact.channel.guild.id].weekId %= 21;
 		let group = groups.list[lastEDT[msgReact.channel.guild.id].groupId];
-		if (group_index != -1) {
+		if (group !== undefined) {
 			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId).then(embed => {
 			msgReact.edit("", embed);
 			});
