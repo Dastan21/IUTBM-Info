@@ -55,7 +55,7 @@ async function commandProcess() {
 
 
 function showHelp(cmds) {
-	let embed = createEmbed();
+	let embed = createEmbed(message);
 	if (cmds.length == 0) {
 		embed.setTitle("PANNEAU D'AIDE - HELP")
 			.setDescription("‎IUTBM-Info est un bot Discord qui permet de voir les EDT sur ADE et de gérer des agendas.\n‎")
@@ -312,7 +312,7 @@ async function edtManager(args) {
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
 			if (weeks_ahead != 0 && (isNaN(weeks_ahead) || Number(weeks_ahead) < 0 || Number(weeks_ahead) > 20)) { msgReply("la semaine doit être un nombre compris entre 0 et 20."); return; }
 
-			msgSend("", await getEDT(group, weeks_ahead))
+			msgSend("", await getEDT(group, weeks_ahead, message.author))
 				.then(message => {
 					for (var k in arrows) message.react(arrows[k]).catch(err => { console.log(err); });
 					lastEDT[message.channel.guild.id] = {};
@@ -340,7 +340,7 @@ async function edtManager(args) {
 			msgReply("cette commande n'existe pas.");
 	}
 }
-function getEDT(group, weeks_ahead) {
+function getEDT(group, weeks_ahead, user) {
 	return new Promise((resolve, reject) => {
 		request('https://sedna.univ-fcomte.fr/jsp/custom/ufc/mplanif.jsp?id=' + groupids[group] + "&jours=" + (7*(Number(weeks_ahead)+1)), function (err, res, body) {
 			if (err) reject(error);
@@ -348,7 +348,7 @@ function getEDT(group, weeks_ahead) {
 			let end = body.indexOf('">Affichage pla');
 			let url = body.slice(start, end).replace("height=480", "height=960").replace("displayConfId=35", "displayConfId=45").replace("idPianoDay=0%2C1%2C2%2C3%2C4%2C5", "&idPianoDay=0%2C1%2C2%2C3%2C4");
 			let week_str = weeks_ahead > 0 ? ` - Semaine +${weeks_ahead}` : "";
-			resolve(createEmbed().setTitle(`**Groupe ${group.toUpperCase()}${week_str}**`).setThumbnail(null).setImage(url));
+			resolve(createEmbed(user).setTitle(`**Groupe ${group.toUpperCase()}${week_str}**`).setThumbnail(null).setImage(url));
 		});
 	});
 }
@@ -374,7 +374,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 		lastEDT[msgReact.channel.guild.id].weekId %= 21;
 		let group = groups.list[lastEDT[msgReact.channel.guild.id].groupId];
 		if (group !== undefined) {
-			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId).then(embed => {
+			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId, user).then(embed => {
 			msgReact.edit("", embed);
 			});
 		}
@@ -385,7 +385,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 async function agendaManager(args) {
 	let i, j, data, inDM;
 	var user_doc, agenda_doc, event_doc, user_pop, agenda_pop;
-	var embed = createEmbed();
+	var embed = createEmbed(message);
 	if (args.length == 0) { showHelp(["agenda"]); return; }
 	user_doc = await User.findOne({ id: message.author.id });
 	if (user_doc == null) { user_doc = new User({ id: message.author.id, username: message.author.username }); await user_doc.save(); }
@@ -666,8 +666,8 @@ async function dmSend(content, attachment) {
 			console.log(err);
 		});
 }
-function createEmbed() {
-	return new Discord.MessageEmbed().setColor(secrets.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21/IUTBM-Info").setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png', dynamic: true}));
+function createEmbed(user) {
+	return new Discord.MessageEmbed().setColor(secrets.embedColor).setThumbnail(bot.user.displayAvatarURL()).setURL("https://github.com/Dastan21/IUTBM-Info").setFooter(user.tag, user.displayAvatarURL({ format: 'png', dynamic: true}));
 }
 function randomInt(min, max) {
 	return Math.round((Math.random()*Math.floor(max))+Math.floor(min));
