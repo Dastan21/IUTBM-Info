@@ -55,7 +55,7 @@ async function commandProcess() {
 
 
 function showHelp(cmds) {
-	let embed = createEmbed(message);
+	let embed = createEmbed(message.author);
 	if (cmds.length == 0) {
 		embed.setTitle("PANNEAU D'AIDE - HELP")
 			.setDescription("‎IUTBM-Info est un bot Discord qui permet de voir les EDT sur ADE et de gérer des agendas.\n‎")
@@ -385,7 +385,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 async function agendaManager(args) {
 	let i, j, data, inDM;
 	var user_doc, agenda_doc, event_doc, user_pop, agenda_pop;
-	var embed = createEmbed(message);
+	var embed = createEmbed(message.author);
 	if (args.length == 0) { showHelp(["agenda"]); return; }
 	user_doc = await User.findOne({ id: message.author.id });
 	if (user_doc == null) { user_doc = new User({ id: message.author.id, username: message.author.username }); await user_doc.save(); }
