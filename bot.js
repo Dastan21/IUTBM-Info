@@ -303,11 +303,11 @@ async function edtManager(args) {
 				group = user_doc.group;
 				for (i = 0; i < message.member._roles.length; i++) {
 					let role = message.guild.roles.cache.get(message.member._roles[i]).name.toLowerCase();
-					if (groupsids.list.includes(role)) { group = role; break; }
+					if (groupids.list.includes(role)) { group = role; break; }
 				}
 			}
 			if (group == undefined) { msgReply("tu n'es assigné à aucun groupe."); return; }
-			if (!groupsids.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
+			if (!groupids.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
 			if (weeks_ahead != 0 && (isNaN(weeks_ahead) || Number(weeks_ahead) < 0 || Number(weeks_ahead) > 20)) { msgReply("la semaine doit être un nombre compris entre 0 et 20."); return; }
 
@@ -323,7 +323,7 @@ async function edtManager(args) {
 		case "set":
 			if (args.length == 1) { showHelp(["edt"].concat(args)); return; }
 			group = args[1];
-			if (!groupsids.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
+			if (!groupids.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
 			if (user_doc.group === group) { msgReply("tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
 			await User.updateOne(user_doc, {group: group});
 			await user_doc.save();
@@ -369,9 +369,9 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 		const userReactions = msgReact.reactions.cache.filter(reaction => reaction.users.cache.has(user.id));
 		try { for (const reaction of userReactions.values()) { reaction.users.remove(user.id); }
 		} catch (error) { console.error('Failed to remove reactions.'); }
-		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groupsids.list.length) % groupsids.list.length;
+		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groupids.list.length) % groupids.list.length;
 		lastEDT[msgReact.channel.guild.id].weekId %= 21;
-		let group = groupsids.list[lastEDT[msgReact.channel.guild.id].groupId];
+		let group = groupids.list[lastEDT[msgReact.channel.guild.id].groupId];
 		if (group !== undefined) {
 			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId, user).then(embed => {
 			msgReact.edit("", embed);
@@ -672,7 +672,7 @@ function randomInt(min, max) {
 	return Math.round((Math.random()*Math.floor(max))+Math.floor(min));
 }
 function randomGroupe() {
-	return groupsids.list[randomInt(0,groupsids.list.length-1)].toUpperCase();
+	return groupids.list[randomInt(0,groupids.list.length-1)].toUpperCase();
 }
 function randomId() {
 	let result = "";
