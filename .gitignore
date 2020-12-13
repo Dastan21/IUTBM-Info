@@ -1,5 +1,5 @@
 node_modules/
-config/
+config/secrets.json
 chromedriver.exe
 debug.log
 run.sh

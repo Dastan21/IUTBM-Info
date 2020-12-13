@@ -8,7 +8,6 @@ const { Image, createCanvas, loadImage } = require('canvas');
 const Agenda = require('./models/Agenda');
 const Event = require('./models/Event');
 const User = require('./models/User');
-const groups = require('./config/groups');
 const groupids = require('./config/groupids');
 const arrows = { up: '🔼', down: '🔽', left: '⬅️', right: '➡️', refresh: '🔄' };
 var lastEDT = {};
@@ -17,14 +16,14 @@ var message = null;
 bot.on('ready', () => { console.log(bot.user.tag + " is online"); })
 
 mongoose
-    .connect(secrets.db_url, {
+    .connect(secrets.db_uri, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			useFindAndModify: false,
 			useCreateIndex: true
 		})
     .then(console.log("MongoDB connected"))
-    .catch(err => console.log(err));
+    .catch(err => console.error(err));
 
 
 bot.on('message', msg => { if (msg.content.toLowerCase().startsWith(secrets.prefix)) { message = msg; commandProcess(); } });
@@ -304,27 +303,27 @@ async function edtManager(args) {
 				group = user_doc.group;
 				for (i = 0; i < message.member._roles.length; i++) {
 					let role = message.guild.roles.cache.get(message.member._roles[i]).name.toLowerCase();
-					if (groups.list.includes(role)) { group = role; break; }
+					if (groupsids.list.includes(role)) { group = role; break; }
 				}
 			}
 			if (group == undefined) { msgReply("tu n'es assigné à aucun groupe."); return; }
-			if (!groups.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
+			if (!groupsids.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
 			let weeks_ahead = args[args.length-1] !== group && args[args.length-1] != args[0] ? args[args.length-1] : 0;
 			if (weeks_ahead != 0 && (isNaN(weeks_ahead) || Number(weeks_ahead) < 0 || Number(weeks_ahead) > 20)) { msgReply("la semaine doit être un nombre compris entre 0 et 20."); return; }
 
 			msgSend("", await getEDT(group, weeks_ahead, message.author))
 				.then(message => {
-					for (var k in arrows) message.react(arrows[k]).catch(err => { console.log(err); });
+					for (var k in arrows) message.react(arrows[k]).catch(err => { console.error(err); });
 					lastEDT[message.channel.guild.id] = {};
 					lastEDT[message.channel.guild.id].msgId = message.id;
 					lastEDT[message.channel.guild.id].weekId = weeks_ahead;
 					lastEDT[message.channel.guild.id].groupId = Object.keys(groupids).indexOf(group);
-				}).catch(err => { console.log(err); });
+				}).catch(err => { console.error(err); });
 			break;
 		case "set":
 			if (args.length == 1) { showHelp(["edt"].concat(args)); return; }
 			group = args[1];
-			if (!groups.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
+			if (!groupsids.list.includes(group)) { msgReply("ce groupe n'existe pas."); return; }
 			if (user_doc.group === group) { msgReply("tu es déjà dans le groupe `" + group.toUpperCase() + "`."); return; }
 			await User.updateOne(user_doc, {group: group});
 			await user_doc.save();
@@ -370,9 +369,9 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 		const userReactions = msgReact.reactions.cache.filter(reaction => reaction.users.cache.has(user.id));
 		try { for (const reaction of userReactions.values()) { reaction.users.remove(user.id); }
 		} catch (error) { console.error('Failed to remove reactions.'); }
-		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groups.list.length) % groups.list.length;
+		lastEDT[msgReact.channel.guild.id].groupId = (lastEDT[msgReact.channel.guild.id].groupId + groupsids.list.length) % groupsids.list.length;
 		lastEDT[msgReact.channel.guild.id].weekId %= 21;
-		let group = groups.list[lastEDT[msgReact.channel.guild.id].groupId];
+		let group = groupsids.list[lastEDT[msgReact.channel.guild.id].groupId];
 		if (group !== undefined) {
 			getEDT(group, lastEDT[msgReact.channel.guild.id].weekId, user).then(embed => {
 			msgReact.edit("", embed);
@@ -644,7 +643,7 @@ async function msgSend(content, attachment) {
 		return await message.channel
 			.send(content, attachment)
 			.catch(err => {
-				console.log(err);
+				console.error(err);
 			});
 	}
 }
@@ -655,7 +654,7 @@ async function msgReply(content){
 		return await message
 			.reply(content)
 			.catch(err => {
-				console.log(err);
+				console.error(err);
 			});
 	}
 }
@@ -663,7 +662,7 @@ async function dmSend(content, attachment) {
 	return await message.author
 		.send(content.charAt(0).toUpperCase()+content.slice(1), attachment)
 		.catch(err => {
-			console.log(err);
+			console.error(err);
 		});
 }
 function createEmbed(user) {
@@ -673,7 +672,7 @@ function randomInt(min, max) {
 	return Math.round((Math.random()*Math.floor(max))+Math.floor(min));
 }
 function randomGroupe() {
-	return groups.list[randomInt(0,groups.list.length-1)].toUpperCase();
+	return groupsids.list[randomInt(0,groupsids.list.length-1)].toUpperCase();
 }
 function randomId() {
 	let result = "";
