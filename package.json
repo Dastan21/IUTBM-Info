@@ -10,5 +10,8 @@
     "mongoose": "^5.10.8",
     "phin": "^3.5.0",
     "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "mquery": ">=3.2.3"
   }
 }
