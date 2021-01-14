@@ -352,7 +352,7 @@ function getEDT(group, weeks_ahead, user) {
 	});
 }
 bot.on('messageReactionAdd', async (messageReaction, user) => {
-	if (!user.bot && lastEDT[messageReaction.message.channel.guild.id].msgId.includes(String(messageReaction.message.id)) && Object.values(arrows).includes(messageReaction._emoji.name)) {
+	if (!user.bot && lastEDT[messageReaction.message.channel.guild.id] && lastEDT[messageReaction.message.channel.guild.id].msgId.includes(String(messageReaction.message.id)) && Object.values(arrows).includes(messageReaction._emoji.name)) {
 		let msgReact = messageReaction.message;
 		let group_index = -1;
 		switch (messageReaction._emoji.name) {
@@ -362,6 +362,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
 			case arrows.right: if (lastEDT[msgReact.channel.guild.id].weekId == 20) { return; } lastEDT[msgReact.channel.guild.id].weekId++; break;
 			case arrows.refresh:
 				let user_doc = await User.findOne({ id: user.id });
+				if (!user_doc) return;
 				group_index = Object.keys(groupids).indexOf(user_doc.group);
 				if (group_index != -1) lastEDT[msgReact.channel.guild.id].groupId = group_index;
 				lastEDT[msgReact.channel.guild.id].weekId = 0;
