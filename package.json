@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Discord bot to show calendar",
   "main": "bot.js",
-  "author": "Loïc Degrange",
+  "author": "Dastan21",
   "dependencies": {
     "canvas": "^2.6.1",
     "discord.js": "^12.3.1",
